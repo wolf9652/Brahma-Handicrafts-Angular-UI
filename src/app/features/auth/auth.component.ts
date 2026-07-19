@@ -1,10 +1,11 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { FormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
+import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-auth',
@@ -14,6 +15,7 @@ import { NgClass } from '@angular/common';
   styleUrls: ['./auth.component.scss']
 })
 export class AuthComponent {
+  private userService = inject(UserService);
   isLoginMode = signal(true);
 
   // Login signals
@@ -24,6 +26,7 @@ export class AuthComponent {
   signupName = signal('');
   signupEmail = signal('');
   signupPassword = signal('');
+  signupRePassword = signal('');
   signupMobile = signal('');
 
   // Track if user attempted submit
@@ -65,6 +68,13 @@ export class AuthComponent {
         password: this.signupPassword(),
         mobile: this.signupMobile()
       });
+      this.userService.signUp({ name: this.signupName(), email: this.signupEmail(), password: this.signupPassword(), phoneNumber: this.signupMobile() }).subscribe({
+      next: (user) => {
+        console.log('User signed up successfully:', user);
+      }, error: (err) => {
+        console.error('Error signing up user:', err);
+      }
+    });
     }
   }
 }

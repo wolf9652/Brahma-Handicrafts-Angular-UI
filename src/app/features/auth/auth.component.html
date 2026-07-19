@@ -1,42 +1,46 @@
 <div class="auth-container">
   <div class="auth-card">
-    <h2>{{ isLoginMode ? 'Login' : 'Sign Up' }}</h2>
+    <h2>{{ isLoginMode() ? 'Login' : 'Sign Up' }}</h2>
 
-    @if (isLoginMode) {
+    @if (isLoginMode()) {
       <form (ngSubmit)="onLogin()">
         <label>Email <span class="required">*</span></label>
-        <input type="email" [(ngModel)]="loginEmail"
+        <input type="email" [(ngModel)]="loginEmail" [ngModelOptions]="{standalone: true}"
                pTooltip="Enter a valid email address" tooltipPosition="right"
-               [ngClass]="{'invalid': submitted && !loginValid}" />
+               [ngClass]="{'invalid': submitted() && !loginValid()}" />
 
         <label>Password <span class="required">*</span></label>
-        <input type="password" [(ngModel)]="loginPassword"
+        <input type="password" [(ngModel)]="loginPassword" [ngModelOptions]="{standalone: true}"
                pTooltip="Password must be at least 6 characters" tooltipPosition="right"
-               [ngClass]="{'invalid': submitted && !loginValid}" />
+               [ngClass]="{'invalid': submitted() && !loginValid()}" />
 
         <button type="submit">Login</button>
       </form>
     }
 
-    @if (!isLoginMode) {
+    @if (!isLoginMode()) {
       <form (ngSubmit)="onSignup()">
         <label>Name <span class="required">*</span></label>
-        <input type="text" [(ngModel)]="signupName"
+        <input type="text" [(ngModel)]="signupName" [ngModelOptions]="{standalone: true}"
                pTooltip="Name is required" tooltipPosition="right"
-               [ngClass]="{'invalid': submitted && !signupValid}" />
+               [ngClass]="{'invalid': submitted() && !signupValid()}" />
 
         <label>Email <span class="required">*</span></label>
-        <input type="email" [(ngModel)]="signupEmail"
+        <input type="email" [(ngModel)]="signupEmail" [ngModelOptions]="{standalone: true}"
                pTooltip="Enter a valid email address" tooltipPosition="right"
-               [ngClass]="{'invalid': submitted && !signupValid}" />
+               [ngClass]="{'invalid': submitted() && !signupValid()}" />
 
         <label>Password <span class="required">*</span></label>
-        <input type="password" [(ngModel)]="signupPassword"
+        <input type="password" [(ngModel)]="signupPassword" [ngModelOptions]="{standalone: true}"
                pTooltip="Password must be at least 6 characters" tooltipPosition="right"
-               [ngClass]="{'invalid': submitted() && !signupValid}" />
-
+               [ngClass]="{'invalid': submitted() && !signupValid()}" />
+        
+        <label>Re-type Password <span class="required">*</span></label>
+        <input type="password" [(ngModel)]="signupRePassword" [ngModelOptions]="{standalone: true}"
+               pTooltip="Password must be at least 6 characters" tooltipPosition="right"
+               [ngClass]="{'invalid': submitted() && !signupValid()}" />
         <label>Mobile Number</label>
-        <input type="text" [(ngModel)]="signupMobile"
+        <input type="text" [(ngModel)]="signupMobile" [ngModelOptions]="{standalone: true}"
                pTooltip="Optional field" tooltipPosition="right" />
 
         <button type="submit">Sign Up</button>
