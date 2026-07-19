@@ -4,3 +4,8 @@
 @tailwind utilities;
 
 /* You can add global styles to this file, and also import other style files */
+::ng-deep .p-dialog .p-dialog-header-icons {
+  position: relative;
+  right: 0;
+  top: 0;
+}

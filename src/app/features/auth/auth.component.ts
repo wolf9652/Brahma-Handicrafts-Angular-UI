@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, output, OutputEmitterRef } from '@angular/core';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -6,11 +6,13 @@ import { PasswordModule } from 'primeng/password';
 import { FormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
 import { UserService } from '../../core/services/user.service';
+import { ApiUrlConstants } from '../../core/constants/apiUrl.constants';
 
 @Component({
   selector: 'app-auth',
   standalone: true,
   imports: [TooltipModule, ButtonModule, InputTextModule, PasswordModule, FormsModule, NgClass],
+  providers: [UserService, ApiUrlConstants],
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss']
 })
@@ -28,6 +30,7 @@ export class AuthComponent {
   signupPassword = signal('');
   signupRePassword = signal('');
   signupMobile = signal('');
+  signUpEvent: OutputEmitterRef<boolean>= output<boolean>();
 
   // Track if user attempted submit
   submitted = signal(false);
@@ -69,12 +72,15 @@ export class AuthComponent {
         mobile: this.signupMobile()
       });
       this.userService.signUp({ name: this.signupName(), email: this.signupEmail(), password: this.signupPassword(), phoneNumber: this.signupMobile() }).subscribe({
-      next: (user) => {
-        console.log('User signed up successfully:', user);
-      }, error: (err) => {
-        console.error('Error signing up user:', err);
-      }
-    });
+        next: (user) => {
+          console.log('User signed up successfully:', user);
+          this.signUpEvent.emit(true);
+        },
+        error: (err) => {
+          console.error('Error signing up user:', err);
+          this.signUpEvent.emit(false);
+        }
+      });
     }
   }
 }
