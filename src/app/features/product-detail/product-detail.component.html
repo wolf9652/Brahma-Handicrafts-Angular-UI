@@ -1,0 +1,108 @@
+<section class="min-h-screen bg-[#e8dac3] px-4 py-10 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <nav class="mb-8">
+      <a routerLink="/products" class="inline-flex items-center text-[#b08c57] hover:text-[#2e2e2e]">
+        <span class="mr-1">←</span>
+        Back to Products
+      </a>
+    </nav>
+
+    @if (product(); as currentProduct) {
+      <div class="overflow-hidden rounded-2xl bg-white shadow-lg">
+        <div class="grid gap-8 p-6 lg:grid-cols-2 lg:p-8">
+          <div>
+            <img [src]="currentProduct.images[selectedImage()] || currentProduct.image" [alt]="currentProduct.name" class="h-96 w-full rounded-lg object-cover" />
+
+            @if (currentProduct.images.length > 1) {
+              <div class="mt-4 flex gap-2">
+                @for (image of currentProduct.images; track image; let index = $index) {
+                  <button type="button" class="h-20 w-20 overflow-hidden rounded-lg border-2" [class.border-[#b08c57]]="selectedImage() === index" [class.border-gray-200]="selectedImage() !== index" (click)="selectImage(index)">
+                    <img [src]="image" [alt]="currentProduct.name + ' ' + (index + 1)" class="h-full w-full object-cover" />
+                  </button>
+                }
+              </div>
+            }
+          </div>
+
+          <div>
+            <div class="mb-4 flex items-start justify-between">
+              <div>
+                <h1 class="mb-2 text-3xl font-bold text-gray-900">{{ currentProduct.name }}</h1>
+                <p class="text-gray-600">{{ currentProduct.category }}</p>
+              </div>
+              <div class="flex gap-2">
+                <button type="button" class="rounded-lg bg-gray-100 p-2" (click)="toggleWishlist()">
+                  <span [class.text-red-500]="isInWishlist()" [class.text-gray-600]="!isInWishlist()">♥</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="mb-6 flex items-center gap-4">
+              <span class="text-3xl font-bold text-gray-900">₹{{ currentProduct.price }}</span>
+              @if (currentProduct.originalPrice) {
+                <span class="text-xl text-gray-500 line-through">₹{{ currentProduct.originalPrice }}</span>
+              }
+            </div>
+
+            <p class="mb-6 text-gray-700">{{ currentProduct.description }}</p>
+
+            <div class="mb-6">
+              <h3 class="mb-3 font-semibold text-gray-900">Features</h3>
+              <ul class="space-y-2">
+                @for (feature of currentProduct.features; track feature) {
+                  <li class="flex items-center">
+                    <span class="mr-3 h-2 w-2 rounded-full bg-[#b08c57]"></span>
+                    <span class="text-gray-700">{{ feature }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+
+            @if (currentProduct.colors?.length) {
+              <div class="mb-6">
+                <label class="mb-2 block text-sm font-medium text-gray-700">Color</label>
+                <div class="flex gap-2">
+                  @for (color of currentProduct.colors; track color) {
+                    <button type="button" class="rounded-lg border px-4 py-2 transition" [class.border-[#b08c57]]="selectedColor() === color" [class.border-gray-300]="selectedColor() !== color" (click)="selectColor(color)">
+                      {{ color }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+
+            <div class="mb-6">
+              <label class="mb-2 block text-sm font-medium text-gray-700">Quantity</label>
+              <div class="flex w-1/4 overflow-hidden rounded-sm border border-[#b28f60] bg-transparent text-lg text-[#b28f60]">
+                <button type="button" class="flex-1 py-1 text-center hover:bg-[#e2cba9]" (click)="decreaseQuantity()">−</button>
+                <div class="flex-1 py-1 text-center">{{ quantity() }}</div>
+                <button type="button" class="flex-1 py-1 text-center hover:bg-[#e2cba9]" (click)="increaseQuantity()">+</button>
+              </div>
+            </div>
+
+            <div class="mb-6 flex flex-col gap-4 sm:flex-row">
+              <button type="button" class="flex-1 rounded-full border border-[#b08c57] bg-transparent px-6 py-3 font-medium text-[#b08c57] transition hover:bg-[#2e2e2e] hover:text-[#e8dac3]" (click)="toggleWishlist()">
+                <span [class.text-red-500]="isInWishlist()" class="text-gray-600">♥</span>
+              </button>
+              <button type="button" class="flex-1 rounded-full border border-[#b08c57] bg-transparent px-6 py-3 font-medium text-[#b08c57] transition hover:bg-[#2e2e2e] hover:text-[#e8dac3]" (click)="shareProduct()">
+                Share
+              </button>
+            </div>
+            <div class="mb-6 flex flex-col gap-4 sm:flex-row">
+              <button type="button" class="flex-1 rounded-full border border-[#b08c57] bg-transparent px-6 py-3 font-medium text-[#b08c57] transition hover:bg-[#2e2e2e] hover:text-[#e8dac3]" (click)="addToCart()">
+                Add to Cart
+              </button>
+              <a routerLink="/checkout" class="rounded-full border-2 border-[#b08c57] bg-[#2e2e2e] px-6 py-3 text-center font-medium text-[#e8dac3] transition hover:bg-transparent hover:text-[#2e2e2e]">
+                Buy Now
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="rounded-2xl border border-dashed border-[#b08c57] bg-white p-8 text-center text-gray-700">
+        Product not found.
+      </div>
+    }
+  </div>
+</section>

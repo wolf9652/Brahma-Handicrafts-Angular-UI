@@ -1,0 +1,51 @@
+<section class="min-h-screen bg-[#e8dac3] px-4 py-10 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-[#2e2e2e]">Wishlist</h1>
+      <p class="mt-2 text-sm text-gray-700">Saved handcrafted favorites.</p>
+    </div>
+
+    @if (wishlistItems().length === 0) {
+      <div class="rounded-2xl border border-dashed border-[#b08c57] bg-white p-8 text-center text-gray-700">
+        <div class="space-y-4">
+          <span class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-600 text-3xl">♥</span>
+          <h2 class="text-2xl font-bold">Your wishlist is empty</h2>
+          <p class="text-gray-600">Start adding items to your wishlist by clicking the heart icon on products you love.</p>
+          <a routerLink="/products" class="inline-flex items-center bg-[#2e2e2e] text-[#e8dac3] border-2 border-[#b08c57] hover:bg-[#e8dac3] hover:text-[#2e2e2e] transition-colors px-6 py-3 rounded-full font-medium">
+            Browse Products
+          </a>
+        </div>
+      </div>
+    } @else {
+      <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        @for (product of wishlistItems(); track product.id) {
+          <div class="overflow-hidden rounded-3xl bg-[#2e2e2e] text-white shadow-lg transition hover:shadow-2xl">
+            <a routerLink="/product/{{ product.id }}" class="block overflow-hidden">
+              <img src="{{ product.image }}" alt="{{ product.name }}" class="h-64 w-full object-cover transition duration-300 hover:scale-105" />
+            </a>
+            <div class="space-y-4 p-5">
+              <a routerLink="/product/{{ product.id }}" class="block">
+                <h3 class="font-playfair text-xl font-bold hover:text-[#caa062]">{{ product.name }}</h3>
+              </a>
+              <p class="text-sm text-gray-300">{{ product.category }}</p>
+              <div class="flex items-center justify-between">
+                <span class="text-2xl font-bold text-[#7fc77f]">₹{{ product.price }}</span>
+                @if (product.originalPrice) {
+                  <span class="text-sm text-gray-400 line-through">₹{{ product.originalPrice }}</span>
+                }
+              </div>
+              <div class="flex gap-3">
+                <button type="button" class="flex-1 rounded-full border border-[#b08c57] bg-[#c59f5b] px-4 py-3 text-sm font-medium text-[#2e2e2e] hover:bg-[#e8dac3] hover:text-[#2e2e2e]" (click)="moveToCart(product)">
+                  Move to Cart
+                </button>
+                <button type="button" class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#3d3d3d] text-red-400 hover:bg-[#4a4a4a]" (click)="removeFromWishlist(product.id)">
+                  ×
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</section>

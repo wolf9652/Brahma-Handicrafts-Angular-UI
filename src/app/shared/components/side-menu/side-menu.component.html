@@ -1,0 +1,14 @@
+<div class="fixed left-0 top-0 z-40 h-full w-full max-w-sm bg-[#fff8ef] shadow-2xl transition-transform" [class.-translate-x-full]="!uiService.isMenuOpen()" [class.translate-x-0]="uiService.isMenuOpen()">
+  <div class="flex items-center justify-between border-b border-amber-200 px-6 py-4">
+    <h2 class="text-lg font-semibold text-amber-900">Explore</h2>
+    <button type="button" class="text-sm text-slate-500" (click)="uiService.toggleMenu()">Close</button>
+  </div>
+
+  <nav class="flex flex-col gap-2 px-6 py-4 text-base font-medium text-slate-700">
+    <a routerLink="/" class="rounded-lg px-3 py-2 hover:bg-amber-100" (click)="uiService.toggleMenu()">Home</a>
+    <a routerLink="/products" class="rounded-lg px-3 py-2 hover:bg-amber-100" (click)="uiService.toggleMenu()">Products</a>
+    <a routerLink="/wishlist" class="rounded-lg px-3 py-2 hover:bg-amber-100" (click)="uiService.toggleMenu()">Wishlist</a>
+    <a routerLink="/about-us" class="rounded-lg px-3 py-2 hover:bg-amber-100" (click)="uiService.toggleMenu()">About Us</a>
+    <a routerLink="/faq" class="rounded-lg px-3 py-2 hover:bg-amber-100" (click)="uiService.toggleMenu()">FAQ</a>
+  </nav>
+</div>

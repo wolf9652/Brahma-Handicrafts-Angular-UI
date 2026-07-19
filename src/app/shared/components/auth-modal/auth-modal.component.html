@@ -1,0 +1,14 @@
+<div *ngIf="authService.isAuthModalOpen()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 px-4">
+  <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+    <div class="mb-4 flex items-center justify-between">
+      <h2 class="text-lg font-semibold">Sign in</h2>
+      <button type="button" class="text-sm text-slate-500" (click)="authService.toggleAuthModal()">Close</button>
+    </div>
+
+    <p class="mb-4 text-sm text-slate-600">Use the demo admin login flow to access the management screens.</p>
+
+    <button type="button" class="w-full rounded-full bg-amber-700 px-4 py-3 text-sm font-semibold text-white" (click)="authService.login()">
+      Continue as admin
+    </button>
+  </div>
+</div>

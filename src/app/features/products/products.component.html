@@ -1,0 +1,48 @@
+<section class="min-h-screen bg-[#e8dac3] px-4 py-10 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-[#2e2e2e]">All Products</h1>
+      <p class="mt-2 text-sm text-gray-700">Browse our handcrafted collection.</p>
+    </div>
+
+    <div class="mb-6 rounded-lg border border-[#b08c57] bg-transparent p-4">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex flex-wrap gap-3">
+          @for (category of categories(); track category) {
+            <button type="button" class="rounded-full border border-[#b08c57] px-4 py-2 text-sm" (click)="setFilter(category)" [class.bg-[#b08c57]]="filter() === category" [class.text-white]="filter() === category">
+              {{ category === 'all' ? 'All Categories' : category }}
+            </button>
+          }
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <select class="rounded-lg border border-[#b08c57] bg-transparent px-4 py-2 text-sm" [value]="sortBy()" (change)="setSortBy($any($event.target).value)">
+            <option value="featured">Featured</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="name">Name: A to Z</option>
+            <option value="rating">Customer Rating</option>
+          </select>
+
+          <div class="flex items-center gap-2">
+            <button type="button" class="rounded-lg px-3 py-2 text-sm" [class.bg-[#b08c57]]="viewMode() === 'grid'" [class.text-white]="viewMode() === 'grid'" (click)="setViewMode('grid')">Grid</button>
+            <button type="button" class="rounded-lg px-3 py-2 text-sm" [class.bg-[#b08c57]]="viewMode() === 'list'" [class.text-white]="viewMode() === 'list'" (click)="setViewMode('list')">List</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-6 text-gray-600">
+      Showing {{ sortedProducts().length }} of {{ allProducts().length }} products
+    </div>
+
+    <div class="grid gap-6" [ngClass]="{
+        'md:grid-cols-2 xl:grid-cols-3': viewMode() === 'grid',
+        'grid-cols-1': viewMode() === 'list'
+      }">
+      @for (product of sortedProducts(); track product.id) {
+        <app-product-card [product]="product" [viewMode]="viewMode()" />
+      }
+    </div>
+  </div>
+</section>

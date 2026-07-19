@@ -1,0 +1,98 @@
+<section class="min-h-screen bg-[#e8dac3] px-4 py-10 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    @if (cartService.items().length === 0) {
+      <div class="flex min-h-[50vh] items-center justify-center rounded-2xl bg-white p-8 text-center shadow-sm">
+        <div>
+          <h2 class="mb-4 text-2xl font-bold text-gray-900">Your cart is empty</h2>
+          <p class="mb-6 text-gray-600">Add some items before checkout.</p>
+          <a routerLink="/products" class="rounded-full border-2 border-[#b08c57] bg-[#2e2e2e] px-6 py-3 font-medium text-[#e8dac3] transition hover:bg-transparent hover:text-[#2e2e2e]">Continue Shopping</a>
+        </div>
+      </div>
+    } @else {
+      <div class="grid gap-8 lg:grid-cols-2">
+        <div class="rounded-2xl bg-white p-6 shadow-sm">
+          <h1 class="mb-8 text-3xl font-semibold text-[#2e2e2e]">Checkout</h1>
+          <form class="space-y-6" (ngSubmit)="placeOrder()">
+            <div>
+              <h2 class="mb-4 text-xl font-bold text-gray-900">Contact Information</h2>
+              <div class="space-y-4">
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-gray-700">Email Address *</label>
+                  <input type="email" class="w-full rounded-lg border border-gray-300 px-4 py-2" />
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-gray-700">Phone Number *</label>
+                  <input type="tel" class="w-full rounded-lg border border-gray-300 px-4 py-2" />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h2 class="mb-4 text-xl font-bold text-gray-900">Shipping Address</h2>
+              <div class="space-y-4">
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-gray-700">Address *</label>
+                  <input type="text" class="w-full rounded-lg border border-gray-300 px-4 py-2" />
+                </div>
+                <div class="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label class="mb-1 block text-sm font-medium text-gray-700">City *</label>
+                    <input type="text" class="w-full rounded-lg border border-gray-300 px-4 py-2" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-sm font-medium text-gray-700">State *</label>
+                    <input type="text" class="w-full rounded-lg border border-gray-300 px-4 py-2" />
+                  </div>
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-gray-700">ZIP Code *</label>
+                  <input type="text" class="w-full rounded-lg border border-gray-300 px-4 py-2" />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h2 class="mb-2 text-xl font-bold text-gray-900">Billing Address</h2>
+              <div class="mb-4 rounded-lg bg-[#d8c5a8] p-3 text-sm">
+                <label class="flex cursor-pointer items-center border-b border-[#c2aa8c] p-2">
+                  <input type="radio" name="billing" value="same" [checked]="billingOption() === 'same'" (change)="billingOption.set('same')" class="mr-2" />
+                  Same as Shipping Address
+                </label>
+                <label class="flex cursor-pointer items-center p-2">
+                  <input type="radio" name="billing" value="different" [checked]="billingOption() === 'different'" (change)="billingOption.set('different')" class="mr-2" />
+                  Use a different Billing Address
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" class="flex w-full items-center justify-center rounded-full border-2 border-[#b08c57] bg-[#2e2e2e] px-6 py-3 font-medium text-[#e8dac3] transition hover:bg-transparent hover:text-[#2e2e2e]">
+              Place Order - ₹{{ total.toFixed(2) }}
+            </button>
+          </form>
+        </div>
+
+        <div class="h-fit rounded-2xl bg-white p-6 shadow-sm">
+          <h2 class="mb-4 text-xl font-semibold text-gray-900">Order Summary</h2>
+          <div class="mb-6 space-y-4">
+            @for (item of cartService.items(); track item.product.id) {
+              <div class="flex items-center gap-3">
+                <img [src]="item.product.image" [alt]="item.product.name" class="h-16 w-16 rounded-lg object-cover" />
+                <div class="flex-1">
+                  <h3 class="font-medium text-gray-900">{{ item.product.name }}</h3>
+                  <p class="text-gray-600">Qty: {{ item.quantity }}</p>
+                </div>
+                <p class="font-medium text-gray-900">₹{{ (item.product.price * item.quantity).toFixed(2) }}</p>
+              </div>
+            }
+          </div>
+          <div class="border-t pt-4">
+            <div class="flex justify-between text-lg font-semibold">
+              <span>Total</span>
+              <span>₹{{ total.toFixed(2) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</section>

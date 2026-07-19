@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+:host .translate-x-full {
+  transform: translateX(100%);
+}
+
+:host .translate-x-0 {
+  transform: translateX(0);
+}

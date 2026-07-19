@@ -1,0 +1,53 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>{{ isLoginMode ? 'Login' : 'Sign Up' }}</h2>
+
+    @if (isLoginMode) {
+      <form (ngSubmit)="onLogin()">
+        <label>Email <span class="required">*</span></label>
+        <input type="email" [(ngModel)]="loginEmail"
+               pTooltip="Enter a valid email address" tooltipPosition="right"
+               [ngClass]="{'invalid': submitted && !loginValid}" />
+
+        <label>Password <span class="required">*</span></label>
+        <input type="password" [(ngModel)]="loginPassword"
+               pTooltip="Password must be at least 6 characters" tooltipPosition="right"
+               [ngClass]="{'invalid': submitted && !loginValid}" />
+
+        <button type="submit">Login</button>
+      </form>
+    }
+
+    @if (!isLoginMode) {
+      <form (ngSubmit)="onSignup()">
+        <label>Name <span class="required">*</span></label>
+        <input type="text" [(ngModel)]="signupName"
+               pTooltip="Name is required" tooltipPosition="right"
+               [ngClass]="{'invalid': submitted && !signupValid}" />
+
+        <label>Email <span class="required">*</span></label>
+        <input type="email" [(ngModel)]="signupEmail"
+               pTooltip="Enter a valid email address" tooltipPosition="right"
+               [ngClass]="{'invalid': submitted && !signupValid}" />
+
+        <label>Password <span class="required">*</span></label>
+        <input type="password" [(ngModel)]="signupPassword"
+               pTooltip="Password must be at least 6 characters" tooltipPosition="right"
+               [ngClass]="{'invalid': submitted() && !signupValid}" />
+
+        <label>Mobile Number</label>
+        <input type="text" [(ngModel)]="signupMobile"
+               pTooltip="Optional field" tooltipPosition="right" />
+
+        <button type="submit">Sign Up</button>
+      </form>
+    }
+
+    <p class="switch-text">
+      {{ isLoginMode() ? "Don't have an account?" : "Already have an account?" }}
+      <a (click)="switchMode()">
+        {{ isLoginMode() ? 'Sign Up' : 'Login' }}
+      </a>
+    </p>
+  </div>
+</div>

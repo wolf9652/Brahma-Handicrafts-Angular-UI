@@ -1,0 +1,63 @@
+<article
+  [routerLink]="['/product', product().id]"
+  class="group cursor-pointer overflow-hidden rounded-b-xl border border-[#b08c57] bg-[#2e2e2e] text-white shadow-sm transition-all duration-300 hover:shadow-lg"
+  [ngClass]="viewMode() === 'grid' ? 'rounded-t-[135px] pb-4 text-center' : 'grid grid-flow-col grid-rows-1 gap-4 rounded-t-xl p-4 text-left'"
+>
+  <div
+    class="relative mt-4 overflow-hidden"
+    [ngClass]="viewMode() === 'grid' ? 'mx-5 rounded-t-[120px]' : 'mt-0 rounded-xl'"
+  >
+    <img
+      [src]="product().image"
+      [alt]="product().name"
+      class="h-[200px] w-full object-cover transition-transform duration-300 group-hover:scale-105"
+    />
+
+    @if (!product().inStock) {
+      <div class="absolute inset-0 flex items-center justify-center bg-black/50">
+        <span class="font-semibold text-white">Out of Stock</span>
+      </div>
+    }
+  </div>
+
+  <div class="flex h-full flex-col p-4" [ngClass]="viewMode() === 'grid' ? '' : 'text-left'">
+    <h3 class="mb-2 min-h-[3.5rem] font-playfair text-xl font-semibold text-white transition-colors group-hover:text-[#b08c57]">
+      {{ product().name }}
+    </h3>
+    <p class="mb-3 min-h-[3.25rem] text-sm text-[#e8dac3] line-clamp-2">{{ product().description }}</p>
+
+    <div class="flex items-center gap-2 font-montserrat" [ngClass]="viewMode() === 'grid' ? 'justify-center' : 'justify-start'">
+      <span class="text-lg font-bold text-green-300">₹{{ product().price }}</span>
+      @if (product().originalPrice) {
+        <span class="text-sm text-red-300 line-through">₹{{ product().originalPrice }}</span>
+      }
+    </div>
+
+    <div class="mt-auto flex items-center justify-center gap-3 pt-4" [ngClass]="viewMode() === 'grid' ? 'flex-wrap' : 'justify-start'">
+      <button
+        type="button"
+        class="rounded-full p-2 transition-colors"
+        (click)="$event.stopPropagation(); toggleWishlist()"
+      >
+        <span [class.text-red-500]="isWishlisted()" [class.text-[#b08c57]]="!isWishlisted()">♥</span>
+      </button>
+
+      <button
+        type="button"
+        class="rounded-full border border-[#b08c57] bg-[#2e2e2e] px-4 py-2 text-sm font-medium text-[#e8dac3] transition hover:bg-[#e8dac3] hover:text-[#2e2e2e]"
+        (click)="$event.stopPropagation(); addToCart()"
+        [disabled]="!product().inStock"
+      >
+        Add To Cart
+      </button>
+
+      <button
+        type="button"
+        class="rounded-full p-2 text-[#b08c57] transition-colors hover:text-[#e8dac3]"
+        (click)="$event.stopPropagation(); shareProduct()"
+      >
+        ↗
+      </button>
+    </div>
+  </div>
+</article>

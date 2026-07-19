@@ -1,0 +1,53 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="fixed inset-0 z-40 bg-black/50 lg:hidden" [class.hidden]="!sidebarOpen()" (click)="toggleSidebar()"></div>
+
+  <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl lg:hidden" [class.hidden]="!sidebarOpen()">
+    <div class="flex items-center justify-between border-b p-4">
+      <span class="text-xl font-bold text-gray-900">Admin Panel</span>
+      <button type="button" class="rounded-lg p-2 hover:bg-gray-100" (click)="toggleSidebar()">✕</button>
+    </div>
+    <nav class="p-4">
+      <ul class="space-y-2">
+        @for (item of navigation; track item.path) {
+          <li>
+            <a [routerLink]="item.path" routerLinkActive="bg-blue-100 text-blue-700" [routerLinkActiveOptions]="{ exact: true }" class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-700 transition hover:bg-gray-100" (click)="toggleSidebar()">
+              <span>{{ item.icon }}</span>
+              <span>{{ item.label }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+  </div>
+
+  <div class="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-64 lg:flex-col lg:bg-white lg:shadow-sm">
+    <div class="border-b p-4">
+      <span class="text-xl font-bold text-gray-900">Admin Panel</span>
+    </div>
+    <nav class="flex-1 p-4">
+      <ul class="space-y-2">
+        @for (item of navigation; track item.path) {
+          <li>
+            <a [routerLink]="item.path" routerLinkActive="bg-blue-100 text-blue-700" [routerLinkActiveOptions]="{ exact: true }" class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-700 transition hover:bg-gray-100">
+              <span>{{ item.icon }}</span>
+              <span>{{ item.label }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+    <div class="border-t p-4">
+      <button type="button" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-gray-700 transition hover:bg-gray-100" (click)="logout()">🚪 <span>Logout</span></button>
+    </div>
+  </div>
+
+  <div class="lg:ml-64">
+    <div class="border-b bg-white shadow-sm lg:hidden">
+      <div class="flex items-center justify-between p-4">
+        <button type="button" class="rounded-lg p-2 hover:bg-gray-100" (click)="toggleSidebar()">☰</button>
+        <span class="text-xl font-bold text-gray-900">Admin Panel</span>
+      </div>
+    </div>
+    <router-outlet></router-outlet>
+  </div>
+</div>

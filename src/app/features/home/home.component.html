@@ -1,0 +1,147 @@
+<div class="min-h-screen bg-[#e8dac3]">
+  <section class="pt-5 mb-4">
+    <div class="mx-4 relative overflow-hidden rounded-xl bg-cover bg-center bg-no-repeat min-h-[100svh]" style="background-image: linear-gradient(rgba(30, 30, 30, 0.72), rgba(30, 30, 30, 0.72)), url('https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=1200');">
+      @if (currentBannerProduct()) {
+        <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-black/60 via-black/20 to-transparent"></div>
+        <div class="relative mx-auto flex h-full max-w-7xl items-center justify-between gap-8 px-6 py-10 text-white">
+          <div class="max-w-xl space-y-6">
+            <div class="border-l-2 border-[#caa062] pl-4">
+              <p class="text-xl font-semibold tracking-widest text-[#caa062]">Featured Product</p>
+            </div>
+            <h1 class="text-4xl font-bold sm:text-5xl">{{ currentBannerProduct().name }}</h1>
+            <p class="max-w-md text-sm leading-7 text-[#f0e7d1] sm:text-base">{{ currentBannerProduct().description }}</p>
+            <div class="flex items-center gap-4">
+              <span class="text-3xl font-bold text-[#caa062]">₹{{ currentBannerProduct().price }}</span>
+              @if (currentBannerProduct().originalPrice) {
+                <span class="text-sm text-gray-300 line-through">₹{{ currentBannerProduct().originalPrice }}</span>
+              }
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <button
+                type="button"
+                (click)="addToCart(currentBannerProduct())"
+                class="rounded-full bg-[#2e2e2e] px-6 py-3 text-sm font-medium text-[#e8dac3] border-2 border-[#b08c57] transition hover:bg-[#e8dac3] hover:text-[#2e2e2e]"
+              >
+                Add to Cart
+              </button>
+              <button
+                type="button"
+                (click)="toggleWishlist()"
+                class="inline-flex items-center justify-center rounded-full border border-[#b08c57] bg-transparent px-4 py-3 text-[#caa062] hover:bg-[#caa062]/10"
+              >
+                <span [class.text-red-500]="isCurrentBannerWishlisted()" class="text-[#b08c57]">♥</span>
+              </button>
+              <button
+                type="button"
+                (click)="shareProduct()"
+                class="inline-flex items-center justify-center rounded-full border border-[#b08c57] bg-transparent px-4 py-3 text-[#caa062] hover:bg-[#caa062]/10"
+              >
+                Share
+              </button>
+            </div>
+          </div>
+
+          <div class="hidden lg:block">
+            <img src="{{ currentBannerProduct().image }}" alt="{{ currentBannerProduct().name }}" class="h-[420px] w-[520px] rounded-3xl object-cover shadow-2xl" />
+          </div>
+        </div>
+      } @else {
+        <div class="text-white">Loading hero product...</div>
+      }
+
+      <button
+        type="button"
+        class="absolute left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-[#caa062] bg-black/40 text-[#caa062] hover:bg-black"
+        (click)="previousSlide()"
+      >
+        ‹
+      </button>
+      <button
+        type="button"
+        class="absolute right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-[#caa062] bg-black/40 text-[#caa062] hover:bg-black"
+        (click)="nextSlide()"
+      >
+        ›
+      </button>
+    </div>
+  </section>
+
+  <section class="rounded-t-xl">
+    <div class="mx-4 rounded-t-xl bg-gradient-to-b from-[#8c8579] to-[#e8dac3] pb-10">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-7">
+        <div class="text-center">
+          <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-blue-600 text-2xl">🚚</span>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Free Shipping</h3>
+          <p class="text-gray-600">Free shipping on all orders</p>
+        </div>
+
+        <div class="text-center">
+          <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-green-600 text-2xl">🛡️</span>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Secure Payment</h3>
+          <p class="text-gray-600">100% secure payment processing</p>
+        </div>
+
+        <div class="text-center">
+          <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-purple-600 text-2xl">↻</span>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Easy Returns</h3>
+          <p class="text-gray-600">Easy 2-day hassle-free returns</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 bg-[#e8dac3]">
+    <div class="mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-playfair font-bold text-[#2e2e2e] mb-4">Featured Products</h2>
+        <p class="text-black max-w-2xl mx-auto">
+          Discover our handpicked selection of premium products designed to elevate your Home
+        </p>
+      </div>
+
+      <div class="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
+        @for (product of featuredProducts(); track product.id) {
+          <app-product-card [product]="product" [viewMode]="'grid'" />
+        }
+      </div>
+
+      <div class="text-center">
+        <a
+          routerLink="/products"
+          class="inline-flex items-center font-montserrat bg-[#2e2e2e] text-[#e8dac3] border-2 border-[#b08c57] px-6 py-3 rounded-lg hover:bg-[#e8dac3] hover:text-[#2e2e2e] transition-colors font-medium"
+        >
+          View All Products
+          <span class="ml-2 text-lg">→</span>
+        </a>
+      </div>
+    </div>
+    <hr class="mt-20 border-t border-gray-500 w-3/4 mx-auto" />
+  </section>
+
+  <section class="bg-[#e8dac3] text-[#2e2e2e] pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-playfair mb-4">Stay Updated</h2>
+      <p class="text-black mb-8 max-w-2xl mx-auto font-montserrat">
+        Subscribe to our newsletter and be the first to know about new handicrafts, exclusive collections, and artisan stories
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+        <input
+          type="email"
+          placeholder="Enter your email"
+          class="flex-1 px-4 py-3 rounded-lg text-gray-900 focus:ring-2 bg-[#f1e8da] focus:ring-[#b08c57] focus:outline-none"
+        />
+        <button class="bg-[#2e2e2e] text-[#e8dac3] border-2 border-[#b08c57] hover:bg-[#e8dac3] hover:text-[#2e2e2e] transition-colors px-6 py-3 rounded-full font-Montserrat font-medium">
+          Subscribe
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
