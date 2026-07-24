@@ -28,6 +28,36 @@ export class CartService {
     this.items.update((current) => current.filter((item) => item.product.id !== productId));
   }
 
+  updateQuantity(productId: string, quantity: number) {
+    if (quantity <= 0) {
+      this.removeFromCart(productId);
+      return;
+    }
+
+    this.items.update((current) => current.map((item) =>
+      item.product.id === productId ? { ...item, quantity } : item
+    ));
+  }
+
+  increaseQuantity(productId: string) {
+    this.items.update((current) => current.map((item) =>
+      item.product.id === productId ? { ...item, quantity: item.quantity + 1 } : item
+    ));
+  }
+
+  decreaseQuantity(productId: string) {
+    const item = this.items().find((item) => item.product.id === productId);
+    if (!item) return;
+    if (item.quantity <= 1) {
+      this.removeFromCart(productId);
+      return;
+    }
+
+    this.items.update((current) => current.map((item) =>
+      item.product.id === productId ? { ...item, quantity: item.quantity - 1 } : item
+    ));
+  }
+
   clearCart() {
     this.items.set([]);
   }

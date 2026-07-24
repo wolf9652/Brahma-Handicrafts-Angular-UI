@@ -1,3 +1,55 @@
 :host {
   display: block;
 }
+
+article {
+  position: relative;
+  border-radius: 28px;
+}
+
+.action-button {
+  position: absolute;
+  z-index: 10;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 9999px;
+}
+
+.action-button.share {
+  left: 1rem;
+  top: 1rem;
+}
+
+.action-button.wishlist {
+  right: 1rem;
+  top: 1rem;
+}
+
+.action-button.add-cart {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  padding: 0.75rem 1.25rem;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+}
+
+.group:hover .action-button {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+.action-button.add-cart {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.9);
+}
+
+.group:hover .action-button.add-cart {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}

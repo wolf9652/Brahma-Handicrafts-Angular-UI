@@ -25,16 +25,12 @@
           </div>
 
           <div>
-            <div class="mb-4 flex items-start justify-between">
+            <div class="mb-4 flex items-start justify-between pr-2">
               <div>
                 <h1 class="mb-2 text-3xl font-bold text-gray-900">{{ currentProduct.name }}</h1>
                 <p class="text-gray-600">{{ currentProduct.category }}</p>
               </div>
-              <div class="flex gap-2">
-                <button type="button" class="rounded-lg bg-gray-100 p-2" (click)="toggleWishlist()">
-                  <span [class.text-red-500]="isInWishlist()" [class.text-gray-600]="!isInWishlist()">♥</span>
-                </button>
-              </div>
+              
             </div>
 
             <div class="mb-6 flex items-center gap-4">
@@ -63,7 +59,7 @@
                 <label class="mb-2 block text-sm font-medium text-gray-700">Color</label>
                 <div class="flex gap-2">
                   @for (color of currentProduct.colors; track color) {
-                    <button type="button" class="rounded-lg border px-4 py-2 transition" [class.border-[#b08c57]]="selectedColor() === color" [class.border-gray-300]="selectedColor() !== color" (click)="selectColor(color)">
+                    <button type="button" class="rounded-lg border px-4 py-2 transition hover:bg-[#e2cba9]/60 hover:scale-105 hover:shadow-sm" [class.bg-[#e2cba9]/40]="selectedColor() === color"  [class.border-[#b08c57]]="selectedColor() === color" [class.font-semibold]="selectedColor() === color" [class.border-gray-300]="selectedColor() !== color" (click)="selectColor(color)">
                       {{ color }}
                     </button>
                   }
@@ -81,18 +77,18 @@
             </div>
 
             <div class="mb-6 flex flex-col gap-4 sm:flex-row">
-              <button type="button" class="flex-1 rounded-full border border-[#b08c57] bg-transparent px-6 py-3 font-medium text-[#b08c57] transition hover:bg-[#2e2e2e] hover:text-[#e8dac3]" (click)="toggleWishlist()">
-                <span [class.text-red-500]="isInWishlist()" class="text-gray-600">♥</span>
+              <button type="button" class="flex-1 rounded-full border border-[#b08c57] bg-transparent px-6 py-3 font-medium text-gray-600 transition hover:bg-[#2e2e2e] hover:text-[#e8dac3]" (click)="toggleWishlist()">
+                <i [class.pi-heart]="!isInWishlist()" [class.pi-heart-fill]="isInWishlist()" [class.text-gray-600]="!isInWishlist()" [class.text-red-500]="isInWishlist()" class="pi"></i>
               </button>
-              <button type="button" class="flex-1 rounded-full border border-[#b08c57] bg-transparent px-6 py-3 font-medium text-[#b08c57] transition hover:bg-[#2e2e2e] hover:text-[#e8dac3]" (click)="shareProduct()">
-                Share
+              <button type="button" class="flex-1 gap-2 rounded-full border border-[#b08c57] bg-transparent px-6 py-3 font-medium text-[#b08c57] transition hover:bg-[#2e2e2e] hover:text-[#e8dac3] flex items-center justify-center" (click)="shareProduct()">
+                <i class="pi pi-share-alt"></i><span>Share</span>
               </button>
             </div>
             <div class="mb-6 flex flex-col gap-4 sm:flex-row">
               <button type="button" class="flex-1 rounded-full border border-[#b08c57] bg-transparent px-6 py-3 font-medium text-[#b08c57] transition hover:bg-[#2e2e2e] hover:text-[#e8dac3]" (click)="addToCart()">
                 Add to Cart
               </button>
-              <a routerLink="/checkout" class="rounded-full border-2 border-[#b08c57] bg-[#2e2e2e] px-6 py-3 text-center font-medium text-[#e8dac3] transition hover:bg-transparent hover:text-[#2e2e2e]">
+              <a routerLink="/checkout" class="rounded-full border-2 border-[#b08c57] bg-[#2e2e2e] px-6 py-3 text-center font-medium text-[#e8dac3] transition hover:bg-transparent hover:text-[#2e2e2e]" (click)="addToCart()">
                 Buy Now
               </a>
             </div>
