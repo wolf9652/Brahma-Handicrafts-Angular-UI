@@ -1,7 +1,12 @@
-<div class="min-h-screen bg-[#fefaf4] text-slate-800">
-  <app-header></app-header>
-  <app-side-menu></app-side-menu>
-  <app-side-cart></app-side-cart>
+<div class="min-h-screen bg-[#fefaf4] text-slate-800 pt-24">
+  <app-header (menuToggle)="toggleMenu()" (cartToggle)="toggleCart()"></app-header>
+  <!-- Backdrop overlay -->
+  <div *ngIf="sideMenuVisible || sideCartVisible"
+       class="fixed inset-0 z-30 "
+       (click)="closeAll()">
+  </div>
+  <app-side-menu *ngIf="sideMenuVisible" (menuToggle)="toggleMenu()"></app-side-menu>
+  <app-side-cart *ngIf="sideCartVisible" (cartToggle)="toggleCart()"></app-side-cart>
   <app-auth-modal></app-auth-modal>
   <app-user-dropdown></app-user-dropdown>
 

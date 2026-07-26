@@ -51,7 +51,11 @@ export class ProductDetailComponent {
   }
 
   protected selectColor(color: string): void {
-    this.selectedColor.set(color);
+    if (this.selectedColor() === color) {
+      this.selectedColor.set(null); // unselect if tapped again
+    } else {
+      this.selectedColor.set(color); // select new color
+    }
   }
 
   protected addToCart(): void {
