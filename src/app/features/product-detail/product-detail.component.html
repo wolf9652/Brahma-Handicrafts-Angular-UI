@@ -11,9 +11,20 @@
       <div class="overflow-hidden rounded-2xl bg-white shadow-lg">
         <div class="grid gap-8 p-6 lg:grid-cols-2 lg:p-8">
           <div>
-            <img [src]="currentProduct.images[selectedImage()] || currentProduct.image" [alt]="currentProduct.name" class="h-96 w-full rounded-lg object-cover" />
+            <img [src]="(selectedVariant()?.images?.[selectedImage()] || selectedVariant()?.image) || (currentProduct.images[selectedImage()] || currentProduct.image)" [alt]="selectedVariant()?.name || currentProduct.name" class="h-[100] w-full rounded-lg object-cover" />
 
-            @if (currentProduct.images.length > 1) {
+            @if (selectedVariant()?.images?.length) {
+              <div class="mt-4 flex gap-2">
+                @for (image of selectedVariant()?.images; track image; let index = $index) {
+                  <button type="button"
+                          class="h-20 w-20 overflow-hidden rounded-lg border-2"
+                          [class.border-[#b08c57]]="selectedImage() === index"
+                          (click)="selectImage(index)">
+                    <img [src]="image" [alt]="selectedVariant()?.name + ' ' + (index + 1)" class="h-full w-full object-cover" />
+                  </button>
+                }
+              </div>
+            } @else if (currentProduct.images.length > 1) {
               <div class="mt-4 flex gap-2">
                 @for (image of currentProduct.images; track image; let index = $index) {
                   <button type="button" class="h-20 w-20 overflow-hidden rounded-lg border-2" [class.border-[#b08c57]]="selectedImage() === index" [class.border-gray-200]="selectedImage() !== index" (click)="selectImage(index)">
@@ -27,20 +38,20 @@
           <div>
             <div class="mb-4 flex items-start justify-between pr-2">
               <div>
-                <h1 class="mb-2 text-3xl font-bold text-gray-900">{{ currentProduct.name }}</h1>
+                <h1 class="mb-2 text-3xl font-bold text-gray-900">{{ selectedVariant()?.name || currentProduct.name }}</h1>
                 <p class="text-gray-600">{{ currentProduct.category }}</p>
               </div>
               
             </div>
 
             <div class="mb-6 flex items-center gap-4">
-              <span class="text-3xl font-bold text-gray-900">₹{{ currentProduct.price }}</span>
+              <span class="text-3xl font-bold text-gray-900">₹{{ selectedVariant()?.price || currentProduct.price }}/-</span>
               @if (currentProduct.originalPrice) {
                 <span class="text-xl text-gray-500 line-through">₹{{ currentProduct.originalPrice }}</span>
               }
             </div>
 
-            <p class="mb-6 text-gray-700">{{ currentProduct.description }}</p>
+            <p class="mb-6 text-gray-700">{{ selectedVariant()?.description || currentProduct.description }}</p>
 
             <div class="mb-6">
               <h3 class="mb-3 font-semibold text-gray-900">Features</h3>
@@ -54,13 +65,14 @@
               </ul>
             </div>
 
-            @if (currentProduct.colors?.length) {
+            @if (currentProduct.designs?.length) {
               <div class="mb-6">
-                <label class="mb-2 block text-sm font-medium text-gray-700">Color</label>
+                <label class="mb-2 block text-sm font-medium text-gray-700">Design</label>
                 <div class="flex gap-2">
-                  @for (color of currentProduct.colors; track color) {
-                    <button type="button" class="rounded-lg border px-4 py-2 transition hover:bg-[#e2cba9]/60 hover:scale-105 hover:shadow-sm" [class.bg-[#e2cba9]/40]="selectedColor() === color"  [class.border-[#b08c57]]="selectedColor() === color" [class.font-semibold]="selectedColor() === color" [class.border-gray-300]="selectedColor() !== color" (click)="selectColor(color)">
-                      {{ color }}
+                  @for (design of currentProduct.designs; track design) {
+                    <button type="button" class="rounded-lg border px-4 py-2 transition hover:bg-[#e2cba9]/60 hover:scale-105 hover:shadow-sm" [class.bg-[#e2cba9]/40]="selectedDesign() === design"  [class.border-[#b08c57]]="selectedDesign() === design
+                    " [class.font-semibold]="selectedDesign() === design" [class.border-gray-300]="selectedDesign() !== design" (click)="selectDesign(design)">
+                      {{ design }}
                     </button>
                   }
                 </div>
