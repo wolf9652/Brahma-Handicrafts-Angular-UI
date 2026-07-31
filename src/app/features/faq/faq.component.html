@@ -1,10 +1,10 @@
-<section class="min-h-screen bg-[#e8dac3] px-4 py-10 sm:px-6 lg:px-8">
+<section class="min-h-screen px-4 py-10 sm:px-6 lg:px-8">
   <div class="mx-auto max-w-6xl py-8">
     <div class="mb-12 text-center">
       <h1 class="mb-4 text-4xl font-bold font-playfair text-[#2e2e2e]">Frequently Asked Questions</h1>
     </div>
 
-    <div class="mb-8 rounded-lg border border-[#b08c57] bg-transparent p-2">
+    <div class="mb-8 rounded-full border border-[#fdd451] bg-transparent p-3">
       <div class="flex flex-col gap-4 md:flex-row">
         <div class="relative flex-1">
           <input
@@ -12,10 +12,10 @@
             placeholder="Search FAQs..."
             [value]="searchTerm()"
             (input)="searchTerm.set($any($event.target).value)"
-            class="w-full rounded-lg border border-[#b08c57] bg-transparent px-4 py-2 pl-10 focus:outline-none"
+            class="w-full rounded-full bg-transparent px-4 py-2 pl-10 focus:outline-none"
           />
         </div>
-        <select [value]="selectedCategory()" (change)="selectedCategory.set($any($event.target).value)" class="rounded-lg border border-[#b08c57] bg-transparent px-4 py-2 focus:outline-none">
+        <select [value]="selectedCategory()" (change)="selectedCategory.set($any($event.target).value)" class="rounded-full border border-[#fdd451] bg-transparent px-4 py-2 focus:outline-none">
           @for (category of categories; track category) {
             <option [value]="category">{{ category === 'all' ? 'All Categories' : category }}</option>
           }
@@ -51,11 +51,11 @@
       </div>
     }
 
-    <div class="mt-12 rounded-lg bg-[#b4aa98] p-8 text-center">
+    <div class="mt-12 rounded-lg bg-[#e3d6bd] p-8 text-center">
       <h2 class="mb-4 text-2xl font-semibold text-[#a3814f]">Still have questions?</h2>
       <p class="mb-6 text-black">Can't find the answer you're looking for? Our customer support team is here to help.</p>
-      <button type="button" (click)="contactSupport()" class="rounded-full border-2 border-[#b08c57] bg-[#2e2e2e] px-6 py-3 font-medium text-[#e8dac3] transition hover:bg-transparent hover:text-[#2e2e2e]">
-        Contact Support
+      <button type="button" (click)="contactSupport()" class="rounded-full border-2 border-[#fdd451] bg-transparent px-6 py-3 font-medium text-black transition hover:bg-[#fdd451] hover:text-[#fff]">
+        Mail Us
       </button>
     </div>
   </div>

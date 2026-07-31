@@ -3,6 +3,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Aboreto brand font for header */
+.aboreto-regular {
+  font-family: 'Aboreto', system-ui;
+  font-weight: 400;
+  font-style: normal;
+}
+
 /* You can add global styles to this file, and also import other style files */
 ::ng-deep .p-dialog .p-dialog-header-icons {
   position: relative;
