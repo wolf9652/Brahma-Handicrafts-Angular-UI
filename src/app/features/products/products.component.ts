@@ -15,6 +15,7 @@ export class ProductsComponent {
   protected readonly filter = signal('all');
   protected readonly sortBy = signal<'featured' | 'price-low' | 'price-high' | 'name' | 'rating'>('featured');
   protected readonly viewMode = signal<'grid' | 'list'>('grid');
+  protected readonly visibleCount = signal(9);
 
   protected readonly categories = computed(() => [
     'all',
@@ -47,19 +48,29 @@ export class ProductsComponent {
     }
   });
 
+  protected readonly visibleProducts = computed(() => this.sortedProducts().slice(0, this.visibleCount()));
+
+  protected readonly hasMoreProducts = computed(() => this.visibleCount() < this.sortedProducts().length);
+
   constructor(private readonly productService: ProductService) {
     this.allProducts.set(this.productService.getProducts());
   }
 
   protected setFilter(category: string): void {
     this.filter.set(category);
+    this.visibleCount.set(9);
   }
 
   protected setSortBy(value: 'featured' | 'price-low' | 'price-high' | 'name' | 'rating'): void {
     this.sortBy.set(value);
+    this.visibleCount.set(9);
   }
 
   protected setViewMode(mode: 'grid' | 'list'): void {
     this.viewMode.set(mode);
+  }
+
+  protected showMoreProducts(): void {
+    this.visibleCount.set(Math.min(this.visibleCount() + 9, this.sortedProducts().length));
   }
 }

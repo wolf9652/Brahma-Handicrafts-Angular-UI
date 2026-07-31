@@ -1,6 +1,6 @@
 import { Component, computed, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Product, ProductService } from '../../core/services/product.service';
+import { Product, ProductVariant, ProductService } from '../../core/services/product.service';
 import { CartService } from '../../core/services/cart.service';
 import { WishlistService } from '../../core/services/wishlist.service';
 
@@ -15,7 +15,8 @@ export class ProductDetailComponent {
   protected readonly product = signal<Product | null>(null);
   protected readonly selectedImage = signal(0);
   protected readonly quantity = signal(1);
-  protected readonly selectedColor = signal<string | null>(null);
+  protected readonly selectedDesign = signal<string | null>(null);
+  protected readonly selectedVariant = signal<ProductVariant | null>(null);
 
   protected readonly isInWishlist = computed(() => {
     const product = this.product();
@@ -32,11 +33,21 @@ export class ProductDetailComponent {
     private readonly cartService: CartService,
     private readonly wishlistService: WishlistService
   ) {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.product.set(this.productService.getProduct(id) ?? null);
-    }
-  }
+      const id = this.route.snapshot.paramMap.get('id');
+      if (id) {
+        const prod = this.productService.getProduct(id);
+        if (prod) {
+          this.product.set(prod);
+
+          // 👇 ADD THIS BLOCK
+          if (prod.variants?.length) {
+            const defaultVariant = prod.variants[0];   // pick first variant by default
+            this.selectedVariant.set(defaultVariant);  // set selectedVariant
+            this.selectedDesign.set(defaultVariant.name); // set selectedDesign so button highlights
+          }
+        }
+      }
+    }  
 
   protected increaseQuantity(): void {
     this.quantity.set(this.quantity() + 1);
@@ -50,12 +61,14 @@ export class ProductDetailComponent {
     this.selectedImage.set(index);
   }
 
-  protected selectColor(color: string): void {
-    if (this.selectedColor() === color) {
-      this.selectedColor.set(null); // unselect if tapped again
-    } else {
-      this.selectedColor.set(color); // select new color
-    }
+  protected selectDesign(design: string): void {
+    const product = this.product();
+    if (!product?.variants) return;
+
+    const variant = product.variants.find(v => v.name === design) || null;
+    this.selectedDesign.set(design);
+    this.selectedVariant.set(variant);
+    this.selectedImage.set(0); // reset gallery to first image
   }
 
   protected addToCart(): void {

@@ -1,7 +1,8 @@
-<div class="min-h-screen bg-[#e8dac3]">
-  <section class="overflow-hidden bg-[#e8dac3]">
+<div class="min-h-screen ">
+  <section class="overflow-hidden ">
     <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-20">
       <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_520px] lg:items-center">
+        <!-- Hero -->
         <div class="space-y-6">
           <p class="inline-flex rounded-full border border-amber-200 bg-amber-50 px-4 py-1 text-sm font-semibold uppercase tracking-[0.24em] text-amber-700">New Collection · 2025</p>
           <h1 class="text-4xl font-bold tracking-tight text-slate-900 sm:text-6xl">
@@ -14,15 +15,15 @@
           <div class="flex flex-col gap-4 sm:flex-row">
             <a
               routerLink="/products"
-              class="inline-flex items-center justify-center rounded-full bg-slate-900 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/10 transition hover:bg-slate-800"
+              class="inline-flex items-center justify-center rounded-full bg-[#fdd451] px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/10 transition hover:bg-[#fdd451]/90"
             >
               Shop the Collection
             </a>
             <a
               routerLink="/about-us"
-              class="inline-flex items-center justify-center rounded-full border border-slate-900 bg-white px-8 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+              class="inline-flex items-center justify-center rounded-full border border-[#fdd451] bg-transparent px-8 py-3 text-sm font-semibold text-slate-900 transition hover:bg-[#fef3c7]"
             >
-              Explore Lookbook
+              Know About Us
             </a>
           </div>
         </div>
@@ -58,11 +59,11 @@
   </section>
 
   <section id="featured-products" class="rounded-t-xl">
-    <div class="mx-4 rounded-t-xl bg-gradient-to-b from-[#8c8579] to-[#e8dac3] pb-10">
+    <div class="mx-4 rounded-xl bg-[#f7efe4] shadow-md pb-10">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-7">
         <div class="text-center">
           <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span class="text-blue-600 text-2xl">🚚</span>
+            <span class="text-blue-600 text-2xl"><i class="pi pi-truck"></i></span>
           </div>
           <h3 class="font-semibold text-gray-900 mb-2">Free Shipping</h3>
           <p class="text-gray-600">Free shipping on all orders</p>
@@ -70,7 +71,7 @@
 
         <div class="text-center">
           <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span class="text-green-600 text-2xl">🛡️</span>
+            <span class="text-green-600 text-2xl"><i class="pi pi-lock"></i></span>
           </div>
           <h3 class="font-semibold text-gray-900 mb-2">Secure Payment</h3>
           <p class="text-gray-600">100% secure payment processing</p>
@@ -78,7 +79,7 @@
 
         <div class="text-center">
           <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span class="text-purple-600 text-2xl">↻</span>
+            <span class="text-purple-600 text-2xl"><i class="pi pi-refresh"></i></span>
           </div>
           <h3 class="font-semibold text-gray-900 mb-2">Easy Returns</h3>
           <p class="text-gray-600">Easy 2-day hassle-free returns</p>
@@ -87,7 +88,7 @@
     </div>
   </section>
 
-  <section class="py-16 bg-[#e8dac3]">
+  <section class="py-16 ">
     <div class="mx-auto px-4 sm:px-6 lg:px-8">
       <div class="mb-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <div>
@@ -100,17 +101,17 @@
         <div class="flex items-center gap-3">
           <button
             type="button"
-            class="inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-900 shadow-sm transition hover:bg-slate-100"
+            class="flex h-12 w-12 items-center justify-center rounded-full border border-[#fdd451] bg-transparent text-slate-900 shadow-sm transition hover:bg-[#fef3c7]"
             (click)="previousFeatured()"
           >
-            ‹
+            <i class="pi pi-angle-left text-lg"></i>
           </button>
           <button
             type="button"
-            class="inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-900 shadow-sm transition hover:bg-slate-100"
+            class="flex-1 h-12 w-12 items-center justify-center rounded-full border border-[#fdd451] bg-transparent text-slate-900 shadow-sm transition hover:bg-[#fef3c7]"
             (click)="nextFeatured()"
           >
-            ›
+            <i class="pi pi-angle-right text-lg"></i>
           </button>
         </div>
       </div>
@@ -134,20 +135,20 @@
             <div class="flex flex-wrap gap-3">
               <button
                 type="button"
-                class="rounded-full bg-slate-900 px-8 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                class="rounded-full bg-[#fdd451] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#fdd451]/90"
                 (click)="addToCart(featuredVisibleProduct())"
               >
                 Add to Cart
               </button>
               <a
                 routerLink="/product/{{ featuredVisibleProduct().id }}"
-                class="inline-flex items-center justify-center rounded-full border border-slate-900 px-8 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+                class="inline-flex items-center justify-center rounded-full border border-[#fdd451] px-8 py-3 text-sm font-semibold text-amber-700 transition hover:bg-[#fef3c7]"
               >
                 View
               </a>
               <button
                 type="button"
-                class="inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-900 transition hover:bg-slate-100"
+                class="inline-flex h-12 w-12 items-center justify-center rounded-full border border-[#fdd451] bg-white text-black transition hover:bg-[#fef3c7]"
                 (click)="toggleFeaturedWishlist(featuredVisibleProduct())"
               >
                 <span [class.text-red-500]="featuredVisibleProduct() && isFeaturedWishlisted(featuredVisibleProduct().id)">♥</span>
@@ -169,6 +170,7 @@
                   type="button"
                   class="h-2.5 w-2.5 rounded-full transition-all"
                   [class.bg-amber-700]="index === featuredCarouselIndex()"
+                  [class.w-5]="index === featuredCarouselIndex()"
                   [class.bg-slate-300]="index !== featuredCarouselIndex()"
                   (click)="featuredCarouselIndex.set(index)"
                 ></button>
@@ -182,8 +184,8 @@
   </section>
 
   <!-- Customer Reviews Carousel -->
-  <section class="py-16 bg-[#e8dac3]">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+  <section class="py-16 ">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 z-10">
       <div class="mb-8 flex items-center justify-between">
         <div>
           <p class="text-xs uppercase tracking-[0.28em] text-amber-700">Customer Stories</p>
@@ -195,10 +197,10 @@
         </div>
       </div>
 
-      <div class="reviews-wrapper overflow-x-auto animate-on-scroll delay-200">
-        <div class="reviews-list flex gap-4">
+      <div class="reviews-wrapper relative overflow-x-auto animate-on-scroll delay-200">
+        <div class="reviews-list flex gap-4 p-10">
           @for (review of reviews(); track review.id; let i = $index) {
-            <article class="review-card w-[300px] rounded-2xl bg-white p-7 text-[#2e2e2e] shadow-sm lg:w-[420px] flex-shrink-0 ${review.rotation} hover:rotate-0 transition-transform duration-500">
+            <article class="review-card w-[300px] rounded-2xl bg-white p-7 text-[#2e2e2e] lg:w-[420px] flex-shrink-0 transition-transform duration-500 shadow-md hover:shadow-none hover:rotate-0" [class]="review.rotation">
               <div class="flex flex-col gap-4">
                 <div class="review-stars">
                   <p-rating [(ngModel)]="review.rating" [readonly]="true" allowHalf="true"/>
@@ -214,11 +216,12 @@
             </article>
           }
         </div>
+        
       </div>
     </div>
   </section>
 
-  <section class="bg-[#e8dac3] text-[#2e2e2e] pb-16">
+  <section class=" text-[#2e2e2e] pb-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h2 class="text-3xl font-playfair mb-4">Stay Updated</h2>
       <p class="text-black mb-8 max-w-2xl mx-auto font-montserrat">
@@ -229,9 +232,9 @@
         <input
           type="email"
           placeholder="Enter your email"
-          class="flex-1 px-4 py-3 rounded-lg text-gray-900 focus:ring-2 bg-[#f1e8da] focus:ring-[#b08c57] focus:outline-none"
+          class="flex-1 px-4 py-3 rounded-full text-gray-900 focus:ring-2 bg-[#f1e8da] focus:ring-[#b08c57] focus:outline-none"
         />
-        <button class="bg-[#2e2e2e] text-[#e8dac3] border-2 border-[#b08c57] hover:bg-[#e8dac3] hover:text-[#2e2e2e] transition-colors px-6 py-3 rounded-full font-Montserrat font-medium">
+        <button class="rounded-full bg-[#fdd451] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#fdd451]/90">
           Subscribe
         </button>
       </div>
