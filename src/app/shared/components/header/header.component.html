@@ -1,19 +1,21 @@
 <header class="fixed top-0 left-0 right-0 z-30 border-b border-amber-200 bg-background/95 backdrop-blur-md shadow-sm backdrop-saturate-150">
   <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-    <button type="button"
-        (click)="onLogoClick()"
-        class="p-3 rounded-full flex items-center justify-center  text-amber-700 hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
-        <i class="pi pi-sidebar"></i>
-    </button>
     <a routerLink="/" class="flex items-center gap-3 text-amber-900">
       <img src="/assets/photos/BH-logo.png" alt="Brahma Handicrafts logo" class="h-10 w-10 rounded-full object-cover" />
       <span class="text-xl font-semibold tracking-wide aboreto-regular">Brahma Handicrafts</span>
     </a>
 
     <div class="flex items-center gap-3">
-      <button type="button" (click)="openLogin()" class=" relative cursor-pointer rounded-full bg-transparent border border-amber-300 px-3 py-2 text-sm text-amber-800 hover:bg-amber-100">
-        <i class="pi pi-user"></i>
-      </button>
+      <div class="relative" (mouseenter)="onAvatarMouseEnter()" (mouseleave)="onAvatarMouseLeave()">
+        <button type="button" (click)="$event.stopPropagation(); onAvatarClick()" class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-transparent border border-amber-300 text-sm text-amber-800 hover:bg-amber-100">
+          @if (authService.isLoggedIn()) {
+            <span class="font-semibold">{{ authService.initials() }}</span>
+          } @else {
+            <i class="pi pi-user"></i>
+          }
+        </button>
+        <app-user-dropdown></app-user-dropdown>
+      </div>
       <a routerLink="/wishlist" class="relative rounded-full border border-amber-300 px-3 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100">
         <i class="pi pi-heart"></i>
         <span *ngIf="wishlistCount > 0" class="absolute -right-2 -top-2 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-amber-700 px-1.5 text-xs font-semibold text-white ">
@@ -26,14 +28,56 @@
           {{ cartCount }}
         </span>
       </div>
-      <a routerLink="/admin" class="rounded-full border border-amber-300 px-3 py-2 text-sm font-medium text-amber-800">
-        Admin
-      </a>
+      @if (authService.isAdmin()) {
+        <a routerLink="/admin" class="rounded-full border border-amber-300 px-3 py-2 text-sm font-medium text-amber-800">
+          Admin
+        </a>
+      }
     </div>
   </div>
 
-  <p-dialog 
-  [(visible)]="showLoginDialog" 
+  <nav class="border-t border-amber-100">
+    @if (isAdminRoute()) {
+      <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-evenly gap-2 px-4 py-3 sm:px-6 lg:px-8">
+        @for (item of adminNavigation; track item.path) {
+          <a [routerLink]="item.path" routerLinkActive="text-amber-900" [routerLinkActiveOptions]="{ exact: item.path === '/admin' }"
+             class="text-sm font-medium uppercase tracking-wide text-amber-800 hover:text-amber-600">{{ item.label }}</a>
+        }
+      </div>
+    } @else {
+      <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-evenly gap-2 px-4 py-3 sm:px-6 lg:px-8">
+        <div class="relative" (mouseenter)="openProductsMenu()" (mouseleave)="closeProductsMenu()">
+          <a routerLink="/products" routerLinkActive="text-amber-900"
+             class="text-sm font-medium uppercase tracking-wide text-amber-800 hover:text-amber-600">Products</a>
+
+          <div *ngIf="isProductsMenuOpen()"
+               class="absolute left-1/2 top-full z-20 w-screen max-w-4xl -translate-x-1/2 border border-amber-100 bg-white shadow-lg">
+            <div class="grid grid-cols-2 gap-x-8 gap-y-6 px-4 py-6 sm:px-6 sm:grid-cols-3 lg:grid-cols-5 lg:px-8">
+              <div *ngFor="let group of categoryGroups()">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-amber-900">{{ group.letter }}</h3>
+                <ul class="mt-2 space-y-1">
+                  <li *ngFor="let category of group.items">
+                    <a [routerLink]="['/products-by-category', category.categoryId]"
+                       class="block text-sm text-slate-600 hover:text-amber-700">
+                      {{ category.categoryName }}
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <p *ngIf="categoryGroups().length === 0" class="text-sm text-slate-500">No categories available.</p>
+            </div>
+          </div>
+        </div>
+
+        <a routerLink="/shipping" routerLinkActive="text-amber-900" class="text-sm font-medium uppercase tracking-wide text-amber-800 hover:text-amber-600">Shipping</a>
+        <a routerLink="/faq" routerLinkActive="text-amber-900" class="text-sm font-medium uppercase tracking-wide text-amber-800 hover:text-amber-600">FAQ</a>
+        <a routerLink="/about-us" routerLinkActive="text-amber-900" class="text-sm font-medium uppercase tracking-wide text-amber-800 hover:text-amber-600">About Us</a>
+      </div>
+    }
+  </nav>
+
+  <p-dialog
+  [(visible)]="authService.isLoginDialogOpen"
   [modal]="true" 
   [closable]="true" 
   [dismissableMask]="true"
@@ -41,6 +85,6 @@
   appendTo="body"
   [contentStyle]="{'padding':'0'}"
   (onHide)="closeLogin()">
-    <app-auth></app-auth>
+    <app-auth (loginEvent)="onLoginSuccess($event)"></app-auth>
   </p-dialog>
 </header>

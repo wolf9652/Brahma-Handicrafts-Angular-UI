@@ -1,4 +1,85 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { ApiUrlConstants } from '../constants/apiUrl.constants';
+
+export interface ProductImage {
+  imageId: string;
+  url: string;
+  altText: string;
+  isPrimary: boolean;
+}
+
+export interface ProductDesign {
+  designId: string;
+  designName: string;
+  designDescription: string;
+  estimatedPrice: number;
+  totalQuantity: number;
+  totalSizes: number;
+  image: ProductImage;
+}
+
+export interface CategoryProduct {
+  productId: string;
+  name: string;
+  isActive: boolean;
+  designs: ProductDesign[];
+}
+
+export interface ProductCategoryRef {
+  categoryId: string;
+  categoryName: string;
+}
+
+export interface CatalogProduct {
+  productId: string;
+  name: string;
+  isActive: boolean;
+  category: ProductCategoryRef;
+  designs: ProductDesign[];
+}
+
+export interface PaginatedProducts {
+  items: CatalogProduct[];
+  pageNumber: number;
+  pageSize: number;
+  totalRecords: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
+export interface GetAllProductsOptions {
+  includeInactive?: boolean;
+  pageNumber?: number;
+  pageSize?: number;
+}
+
+export interface DesignSize {
+  sizeId: string;
+  sizeName: string;
+  length: number;
+  breadth: number;
+  height: number;
+  weight: number;
+  basePrice: number;
+  mrp: number;
+  inventoryStockId: string;
+  quantity: number;
+}
+
+export interface DesignDetail {
+  productId: string;
+  productName: string;
+  designId: string;
+  designName: string;
+  designDescription: string;
+  estimatedPrice: number;
+  images: ProductImage[];
+  sizes: DesignSize[];
+}
+
 export interface ProductVariant {
   name: string;              // e.g. "Classic", "Sport", "Luxury"
   price: number;
@@ -15,7 +96,7 @@ export interface Product {
   originalPrice?: number;
   image: string;
   images: string[];
-  category: string;
+  category?: string;
   description: string;
   features: string[];
   inStock: boolean;
@@ -24,6 +105,28 @@ export interface Product {
   sizes?: string[];
   designs?: string[];
   variants?: ProductVariant[];
+  /** Number of size options available for this design, from the API's per-design totalSizes field. */
+  totalSizes?: number;
+}
+
+export interface NewestProductImage {
+  imageId: string;
+  url: string;
+  altText: string;
+  isPrimary: boolean;
+}
+
+// One item per design, as returned by GET /api/Products/newest.
+export interface NewestProduct {
+  productId: string;
+  productName: string;
+  categoryId: string;
+  categoryName: string;
+  designId: string;
+  designName: string;
+  designDescription: string;
+  estimatedPrice: number;
+  image: NewestProductImage;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -376,11 +479,35 @@ export class ProductService {
     },
   ]);
 
+  private http = inject(HttpClient);
+  private urlConstants = inject(ApiUrlConstants);
+
   getProducts() {
     return this.products();
   }
 
   getProduct(id: string) {
     return this.products().find((product) => product.id === id);
+  }
+
+  getProductsByCategory(categoryId: string): Observable<CategoryProduct[]> {
+    return this.http.get<CategoryProduct[]>(this.urlConstants.productsByCategory(categoryId));
+  }
+
+  getDesignDetail(productId: string, designId: string): Observable<DesignDetail> {
+    return this.http.get<DesignDetail>(this.urlConstants.designDetail(productId, designId));
+  }
+
+  getAllProducts(options: GetAllProductsOptions = {}): Observable<PaginatedProducts> {
+    const params = new HttpParams()
+      .set('includeInactive', String(options.includeInactive ?? false))
+      .set('pageNumber', String(options.pageNumber ?? 1))
+      .set('pageSize', String(options.pageSize ?? 50));
+
+    return this.http.get<PaginatedProducts>(this.urlConstants.ALL_PRODUCTS, { params });
+  }
+
+  getNewestProducts(): Observable<NewestProduct[]> {
+    return this.http.get<NewestProduct[]>(this.urlConstants.NEWEST_PRODUCTS);
   }
 }

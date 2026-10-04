@@ -116,32 +116,29 @@
         </div>
       </div>
 
+      @if (featuredProducts().length > 0) {
       <div class="relative overflow-hidden rounded-[2rem] bg-white/90 p-6 shadow-[0_32px_80px_rgba(15,23,42,0.12)]">
         <div class="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
           <div class="space-y-5">
             <div class="inline-flex rounded-full bg-amber-50 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-amber-700">
               new
             </div>
-            <h3 class="text-4xl font-semibold leading-tight text-slate-900">
-              {{ featuredVisibleProduct().name }}
-            </h3>
+            <div>
+              <h3 class="text-4xl font-semibold leading-tight text-slate-900">
+                {{ featuredVisibleProduct().title }}
+              </h3>
+              <p class="mt-2 text-sm text-slate-500">{{ featuredVisibleProduct().categoryName }}</p>
+            </div>
             <p class="max-w-xl text-base leading-8 text-slate-600">
               {{ featuredVisibleProduct().description }}
             </p>
             <div class="flex flex-wrap items-center gap-4">
               <span class="text-3xl font-bold text-[#2e2e2e]">₹{{ featuredVisibleProduct().price }}</span>
-              <span *ngIf="featuredVisibleProduct().originalPrice" class="text-sm text-slate-400 line-through">₹{{ featuredVisibleProduct().originalPrice }}</span>
             </div>
             <div class="flex flex-wrap gap-3">
-              <button
-                type="button"
-                class="rounded-full bg-[#fdd451] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#fdd451]/90"
-                (click)="addToCart(featuredVisibleProduct())"
-              >
-                Add to Cart
-              </button>
               <a
-                routerLink="/product/{{ featuredVisibleProduct().id }}"
+                [routerLink]="['/product', featuredVisibleProduct().productId]"
+                [queryParams]="{ designId: featuredVisibleProduct().designId, category: featuredVisibleProduct().categoryName }"
                 class="inline-flex items-center justify-center rounded-full border border-[#fdd451] px-8 py-3 text-sm font-semibold text-amber-700 transition hover:bg-[#fef3c7]"
               >
                 View
@@ -151,7 +148,7 @@
                 class="inline-flex h-12 w-12 items-center justify-center rounded-full border border-[#fdd451] bg-white text-black transition hover:bg-[#fef3c7]"
                 (click)="toggleFeaturedWishlist(featuredVisibleProduct())"
               >
-                <span [class.text-red-500]="featuredVisibleProduct() && isFeaturedWishlisted(featuredVisibleProduct().id)">♥</span>
+                <span [class.text-red-500]="isFeaturedWishlisted(featuredVisibleProduct())">♥</span>
               </button>
             </div>
           </div>
@@ -160,12 +157,12 @@
             <div class="overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-50">
               <img
                 [src]="featuredVisibleProduct().image"
-                [alt]="featuredVisibleProduct().name"
+                [alt]="featuredVisibleProduct().title"
                 class="h-[420px] w-full object-cover"
               />
             </div>
             <div class="mt-6 flex items-center justify-center gap-2">
-              @for (product of featuredProducts(); track product.id; let index = $index) {
+              @for (product of featuredProducts(); track product.designId; let index = $index) {
                 <button
                   type="button"
                   class="h-2.5 w-2.5 rounded-full transition-all"
@@ -179,6 +176,7 @@
           </div>
         </div>
       </div>
+      }
     </div>
     <hr class="mt-20 border-t border-gray-500 w-3/4 mx-auto" />
   </section>

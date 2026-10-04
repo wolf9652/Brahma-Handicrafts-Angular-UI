@@ -20,9 +20,14 @@
 
     @if (!isLoginMode()) {
       <form (ngSubmit)="onSignup()">
-        <label>Name <span class="required">*</span></label>
-        <input type="text" [(ngModel)]="signupName" [ngModelOptions]="{standalone: true}"
-               pTooltip="Name is required" tooltipPosition="right"
+        <label>First Name <span class="required">*</span></label>
+        <input type="text" [(ngModel)]="signupFirstName" [ngModelOptions]="{standalone: true}"
+               pTooltip="First name is required" tooltipPosition="right"
+               [ngClass]="{'invalid': submitted() && !signupValid()}" />
+
+        <label>Last Name <span class="required">*</span></label>
+        <input type="text" [(ngModel)]="signupLastName" [ngModelOptions]="{standalone: true}"
+               pTooltip="Last name is required" tooltipPosition="right"
                [ngClass]="{'invalid': submitted() && !signupValid()}" />
 
         <label>Email <span class="required">*</span></label>
@@ -37,7 +42,7 @@
         
         <label>Re-type Password <span class="required">*</span></label>
         <input type="password" [(ngModel)]="signupRePassword" [ngModelOptions]="{standalone: true}"
-               pTooltip="Password must be at least 6 characters" tooltipPosition="right"
+               pTooltip="Must match the password above" tooltipPosition="right"
                [ngClass]="{'invalid': submitted() && !signupValid()}" />
         <label>Mobile Number</label>
         <input type="text" [(ngModel)]="signupMobile" [ngModelOptions]="{standalone: true}"

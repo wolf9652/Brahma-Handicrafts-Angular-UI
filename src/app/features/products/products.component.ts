@@ -1,7 +1,20 @@
-import { Component, computed, signal } from '@angular/core';
-import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
-import { Product, ProductService } from '../../core/services/product.service';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
+import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
+import { CatalogProduct, Product, ProductDesign, ProductService } from '../../core/services/product.service';
+import { ApiUrlConstants } from '../../core/constants/apiUrl.constants';
+import { buildAssetUrl } from '../../core/utils/image-url.util';
+
+interface ProductCardItem {
+  product: Product;
+  queryParams: { designId: string; category: string };
+  categoryId: string;
+}
+
+interface CategoryOption {
+  id: string;
+  name: string;
+}
 
 @Component({
   selector: 'app-products',
@@ -10,67 +23,115 @@ import { NgClass } from '@angular/common';
   templateUrl: './products.component.html',
   styleUrl: './products.component.scss'
 })
-export class ProductsComponent {
-  allProducts = signal<Product[]>([]);
+export class ProductsComponent implements OnInit {
+  protected readonly cardItems = signal<ProductCardItem[]>([]);
+  protected readonly loading = signal(true);
   protected readonly filter = signal('all');
   protected readonly sortBy = signal<'featured' | 'price-low' | 'price-high' | 'name' | 'rating'>('featured');
   protected readonly viewMode = signal<'grid' | 'list'>('grid');
-  protected readonly visibleCount = signal(9);
 
-  protected readonly categories = computed(() => [
-    'all',
-    ...Array.from(new Set(this.allProducts().map((product) => product.category))),
-  ]);
+  protected readonly categories = computed<CategoryOption[]>(() => {
+    const seen = new Map<string, string>();
+    for (const item of this.cardItems()) {
+      if (!seen.has(item.categoryId)) {
+        seen.set(item.categoryId, item.queryParams.category);
+      }
+    }
 
-  protected readonly filteredProducts = computed(() => {
-    const currentFilter = this.filter();
-    const products = this.allProducts();
-
-    return currentFilter === 'all'
-      ? products
-      : products.filter((product) => product.category === currentFilter);
+    return [
+      { id: 'all', name: 'All Categories' },
+      ...Array.from(seen.entries()).map(([id, name]) => ({ id, name }))
+    ];
   });
 
-  protected readonly sortedProducts = computed(() => {
-    const products = [...this.filteredProducts()];
+  protected readonly filteredItems = computed(() => {
+    const currentFilter = this.filter();
+    const items = this.cardItems();
+
+    return currentFilter === 'all'
+      ? items
+      : items.filter((item) => item.categoryId === currentFilter);
+  });
+
+  protected readonly sortedItems = computed(() => {
+    const items = [...this.filteredItems()];
 
     switch (this.sortBy()) {
       case 'price-low':
-        return products.sort((a, b) => a.price - b.price);
+        return items.sort((a, b) => a.product.price - b.product.price);
       case 'price-high':
-        return products.sort((a, b) => b.price - a.price);
+        return items.sort((a, b) => b.product.price - a.product.price);
       case 'name':
-        return products.sort((a, b) => a.name.localeCompare(b.name));
+        return items.sort((a, b) => a.product.name.localeCompare(b.product.name));
       case 'rating':
-        return products.sort((a, b) => b.rating - a.rating);
+        return items.sort((a, b) => b.product.rating - a.product.rating);
       default:
-        return products;
+        return items;
     }
   });
 
-  protected readonly visibleProducts = computed(() => this.sortedProducts().slice(0, this.visibleCount()));
+  constructor(
+    private readonly productService: ProductService,
+    private readonly urlConstants: ApiUrlConstants
+  ) {}
 
-  protected readonly hasMoreProducts = computed(() => this.visibleCount() < this.sortedProducts().length);
-
-  constructor(private readonly productService: ProductService) {
-    this.allProducts.set(this.productService.getProducts());
+  ngOnInit(): void {
+    this.productService.getAllProducts().subscribe({
+      next: (response) => {
+        this.cardItems.set(this.buildCardItems(response.items));
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error fetching products:', err);
+        this.loading.set(false);
+      }
+    });
   }
 
-  protected setFilter(category: string): void {
-    this.filter.set(category);
-    this.visibleCount.set(9);
+  private buildCardItems(products: CatalogProduct[]): ProductCardItem[] {
+    const items: ProductCardItem[] = [];
+
+    for (const product of products) {
+      for (const design of product.designs ?? []) {
+        items.push({
+          product: this.mapToProduct(product, design),
+          queryParams: { designId: design.designId, category: product.category.categoryName },
+          categoryId: product.category.categoryId
+        });
+      }
+    }
+
+    return items;
+  }
+
+  private mapToProduct(product: CatalogProduct, design: ProductDesign): Product {
+    const imageUrl = buildAssetUrl(this.urlConstants.origin, design.image?.url);
+
+    return {
+      id: product.productId,
+      name: `${product.name} ${design.designName}`,
+      price: design.estimatedPrice,
+      image: imageUrl,
+      images: imageUrl ? [imageUrl] : [],
+      category: product.category.categoryName,
+      description: design.designDescription,
+      features: [],
+      inStock: design.totalQuantity > 0,
+      rating: 0,
+      reviews: 0,
+      totalSizes: design.totalSizes
+    };
+  }
+
+  protected setFilter(categoryId: string): void {
+    this.filter.set(categoryId);
   }
 
   protected setSortBy(value: 'featured' | 'price-low' | 'price-high' | 'name' | 'rating'): void {
     this.sortBy.set(value);
-    this.visibleCount.set(9);
   }
 
   protected setViewMode(mode: 'grid' | 'list'): void {
     this.viewMode.set(mode);
-  }
-
-  protected showMoreProducts(): void {
-    this.visibleCount.set(Math.min(this.visibleCount() + 9, this.sortedProducts().length));
   }
 }

@@ -1,11 +1,13 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { CartService } from '../../core/services/cart.service';
-import { Product, ProductService } from '../../core/services/product.service';
+import { NewestProduct, Product, ProductService } from '../../core/services/product.service';
 import { WishlistService } from '../../core/services/wishlist.service';
 import { UserService } from '../../core/services/user.service';
+import { Category, CategoryService } from '../../core/services/category.service';
+import { AuthService } from '../../core/services/auth.service';
 import { ApiUrlConstants } from '../../core/constants/apiUrl.constants';
+import { buildAssetUrl } from '../../core/utils/image-url.util';
 import { RatingModule } from 'primeng/rating';
 import { FormsModule } from '@angular/forms';
 
@@ -21,6 +23,17 @@ interface Review {
   stars?: ('full' | 'half' | 'empty')[];
 }
 
+// View model for one featured card, built from a NewestProduct.
+interface FeaturedItem {
+  productId: string;
+  designId: string;
+  title: string;
+  categoryName: string;
+  description: string;
+  price: number;
+  image: string;
+}
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -29,16 +42,20 @@ interface Review {
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent {
-  
+export class HomeComponent implements OnInit, OnDestroy {
+
   protected readonly products = signal<Product[]>([]);
+  protected readonly categories = signal<Category[]>([]);
   protected readonly currentSlide = signal(0);
   protected readonly featuredCarouselIndex = signal(0);
   protected readonly viewMode = signal<'grid' | 'list'>('grid');
   protected readonly reviews = signal<Review[]>([]);
 
   protected readonly bannerProducts = computed(() => this.products().slice(0, 4));
-  protected readonly featuredProducts = computed(() => this.products().slice(0, 5));
+  protected readonly newestProducts = signal<NewestProduct[]>([]);
+  protected readonly featuredProducts = computed<FeaturedItem[]>(() =>
+    this.newestProducts().slice(0, 5).map((product) => this.toFeaturedItem(product))
+  );
   protected readonly currentBannerProduct = computed(
     () => this.bannerProducts()[this.currentSlide()] ?? this.bannerProducts()[0]
   );
@@ -47,19 +64,21 @@ export class HomeComponent {
   );
   protected readonly isCurrentBannerWishlisted = computed(() => {
     const product = this.currentBannerProduct();
-    return product ? this.wishlistService.items().some((item) => item.id === product.id) : false;
+    return product ? this.wishlistService.isWishlisted(product.id) : false;
   });
 
-  protected readonly isFeaturedWishlisted = (productId: string): boolean => {
-    return this.wishlistService.items().some((item) => item.id === productId);
+  protected readonly isFeaturedWishlisted = (item: FeaturedItem): boolean => {
+    return this.wishlistService.isWishlisted(item.productId, item.designId);
   };
 
   private featuredCarouselTimer?: number;
 
   constructor(
     private readonly productService: ProductService,
-    private readonly cartService: CartService,
-    private readonly wishlistService: WishlistService
+    private readonly categoryService: CategoryService,
+    private readonly wishlistService: WishlistService,
+    private readonly authService: AuthService,
+    private readonly urlConstants: ApiUrlConstants
   ) {
     this.products.set(this.productService.getProducts());
 
@@ -121,6 +140,34 @@ export class HomeComponent {
 
   ngOnInit(): void {
     this.featuredCarouselTimer = window.setInterval(() => this.nextFeatured(), 6000);
+    this.loadCategories();
+    this.loadNewestProducts();
+  }
+
+  private loadNewestProducts(): void {
+    this.productService.getNewestProducts().subscribe({
+      next: (products) => this.newestProducts.set(products),
+      error: (err) => console.error('Error fetching newest products:', err)
+    });
+  }
+
+  private toFeaturedItem(product: NewestProduct): FeaturedItem {
+    return {
+      productId: product.productId,
+      designId: product.designId,
+      title: `${product.productName} (${product.designName})`,
+      categoryName: product.categoryName,
+      description: product.designDescription,
+      price: product.estimatedPrice,
+      image: buildAssetUrl(this.urlConstants.origin, product.image?.url)
+    };
+  }
+
+  private loadCategories(): void {
+    this.categoryService.getCategories().subscribe({
+      next: (categories) => this.categories.set(categories),
+      error: (err) => console.error('Error fetching categories:', err)
+    });
   }
 
   ngOnDestroy(): void {
@@ -163,17 +210,26 @@ export class HomeComponent {
     this.wishlistService.addToWishlist(product);
   }
 
-  protected toggleFeaturedWishlist(product: Product): void {
-    if (this.isFeaturedWishlisted(product.id)) {
-      this.wishlistService.removeFromWishlist(product.id);
+  protected toggleFeaturedWishlist(item: FeaturedItem): void {
+    const userId = this.authService.session()?.userId;
+    if (!userId || !this.authService.isLoggedIn()) {
+      this.authService.openLoginDialog();
       return;
     }
 
-    this.wishlistService.addToWishlist(product);
-  }
+    const wishlistItemId = this.wishlistService.getWishlistItemId(item.productId, item.designId);
+    if (wishlistItemId) {
+      this.wishlistService.deleteWishlistItem(wishlistItemId, userId).subscribe({
+        next: () => this.wishlistService.loadWishlistForUser(userId),
+        error: (err) => console.error('Error removing from wishlist:', err)
+      });
+      return;
+    }
 
-  protected addToCart(product: Product): void {
-    this.cartService.addToCart(product);
+    this.wishlistService.addToWishlistApi({ userId, productId: item.productId, designId: item.designId }).subscribe({
+      next: () => this.wishlistService.loadWishlistForUser(userId),
+      error: (err) => console.error('Error adding to wishlist:', err)
+    });
   }
 
   protected shareProduct(product?: Product): void {

@@ -1,5 +1,7 @@
 <article
   [routerLink]="['/product', product().id]"
+  [queryParams]="queryParams()"
+  (click)="onCardOpen()"
   class="group relative cursor-pointer overflow-hidden rounded-[28px] border border-[#fdd451] bg-[#fdf5d9] text-[#2e2e2e] shadow-sm transition-all duration-300 hover:shadow-lg"
   [ngClass]="viewMode() === 'grid' ? 'pb-4 text-center' : 'grid grid-flow-col grid-rows-1 gap-4 rounded-[28px] p-4 text-left'"
 >
@@ -36,7 +38,7 @@
     </button>
 
     <div class="absolute bottom-4 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300"> 
-      <button type="button" class="action-button add-cart w-full text-xs py-2.5 text-center bg-background/95 backdrop-blur-md shadow-sm backdrop-saturate-150" (click)="$event.stopPropagation(); addToCart()" [disabled]="!product().inStock">
+      <button type="button" class="action-button add-cart w-full text-xs py-2.5 text-center bg-background/95 backdrop-blur-md shadow-sm backdrop-saturate-150" (click)="$event.stopPropagation(); onAddToCartClick()" [disabled]="!product().inStock || sizeDialogLoading()">
         Add To Cart
       </button>
     </div>
@@ -44,11 +46,18 @@
   </div>
 
   <div class="flex h-full flex-col p-4" [ngClass]="viewMode() === 'grid' ? '' : 'text-left'">
-    <div class="relative mb-2 min-h-[3.5rem]">
+    <div class="mb-2 min-h-[3.5rem]">
+      @if (product().totalSizes) {
+        <div class="flex justify-end">
+          <span class="rounded-full bg-[#fdd451]/40 px-2 py-0.5 text-xs font-semibold text-[#8a6d1f]">
+            {{ product().totalSizes }} {{ product().totalSizes === 1 ? 'Size' : 'Sizes' }}
+          </span>
+        </div>
+      }
       <h3 class="font-playfair text-xl font-bold text-[#2e2e2e] transition-colors hover:text-[#b08c57]">
         {{ product().name }}
       </h3>
-    </div>  
+    </div>
     
 
     <div class="mt-auto flex items-center justify-between px-4 gap-2 font-montserrat" [ngClass]="viewMode() === 'grid' ? 'justify-center' : 'justify-start'">
@@ -65,3 +74,52 @@
     </div>
   </div>
 </article>
+
+<p-dialog
+  [(visible)]="showSizeDialog"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  [style]="{width: '360px'}"
+  appendTo="body"
+  (onHide)="closeSizeDialog()"
+>
+  @if (sizeDialogDesign(); as design) {
+    <div class="flex flex-col items-center gap-3 p-2 text-center border border-amber-200 bg-[#fdf5d9] rounded-xl ">
+      <img [src]="product().image" [alt]="product().name" class="h-40 w-40 rounded-xl object-cover" />
+
+      <h3 class="text-lg font-bold text-black">{{ product().name }}</h3>
+      @if (product().category) {
+        <p class="text-xs text-gray-500">{{ product().category }}</p>
+      }
+
+      <div class="text-xl font-bold text-[#b08c57]">
+        ₹{{ selectedSize() ? selectedSize()!.basePrice : design.estimatedPrice }}
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-2">
+        @for (size of design.sizes; track size.sizeId) {
+          <button
+            type="button"
+            class="rounded-lg border px-4 py-2 text-sm transition"
+            [class.border-[#b08c57]]="selectedSize()?.sizeId === size.sizeId"
+            [class.bg-[#fdd451]/30]="selectedSize()?.sizeId === size.sizeId"
+            [class.border-gray-300]="selectedSize()?.sizeId !== size.sizeId"
+            (click)="selectDialogSize(size)"
+          >
+            {{ size.sizeName }}
+          </button>
+        }
+      </div>
+
+      <button
+        type="button"
+        class="mt-2 w-full rounded-full bg-[#2e2e2e] px-6 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50"
+        [disabled]="!selectedSize()"
+        (click)="confirmDialogAddToCart()"
+      >
+        Add To Cart
+      </button>
+    </div>
+  }
+</p-dialog>

@@ -8,9 +8,9 @@
     <div class="mb-6 rounded-full border border-[#fdd451] bg-transparent p-4">
       <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div class="flex flex-wrap gap-3">
-          @for (category of categories(); track category) {
-            <button type="button" class="inline-flex items-center justify-center rounded-full border border-[#fdd451] px-4 py-2 text-sm font-semibold transition hover:bg-[#fdd451]/90" (click)="setFilter(category)" [class.bg-[#fdd451]]="filter() === category" [class.text-white]="filter() === category" [class.hover:bg-[#fffbc7]]="filter() === category">
-              {{ category === 'all' ? 'All Categories' : category }}
+          @for (category of categories(); track category.id) {
+            <button type="button" class="inline-flex items-center justify-center rounded-full border border-[#fdd451] px-4 py-2 text-sm font-semibold transition hover:bg-[#fdd451]/90" (click)="setFilter(category.id)" [class.bg-[#fdd451]]="filter() === category.id" [class.text-white]="filter() === category.id" [class.hover:bg-[#fffbc7]]="filter() === category.id">
+              {{ category.name }}
             </button>
           }
         </div>
@@ -21,7 +21,6 @@
             <option value="price-low">Price: Low to High</option>
             <option value="price-high">Price: High to Low</option>
             <option value="name">Name: A to Z</option>
-            <option value="rating">Customer Rating</option>
           </select>
 
           <div class="flex items-center gap-2">
@@ -32,23 +31,20 @@
       </div>
     </div>
 
-    <div class="mb-6 text-gray-600">
-      Showing {{ visibleProducts().length }} of {{ sortedProducts().length }} products
-    </div>
+    @if (loading()) {
+      <p class="text-gray-600">Loading products...</p>
+    } @else {
+      <div class="mb-6 text-gray-600">
+        Showing {{ sortedItems().length }} products
+      </div>
 
-    <div class="grid gap-6" [ngClass]="{
-        'md:grid-cols-2 xl:grid-cols-3': viewMode() === 'grid',
-        'grid-cols-1': viewMode() === 'list'
-      }">
-      @for (product of visibleProducts(); track product.id) {
-        <app-product-card [product]="product" [viewMode]="viewMode()" />
-      }
-    </div>
-    @if (hasMoreProducts()) {
-      <div class="mt-8 flex justify-center">
-        <button type="button" class="rounded-full border border-[#b08c57] bg-[#b08c57] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#9a7245]" (click)="showMoreProducts()">
-          Show more
-        </button>
+      <div class="grid gap-6" [ngClass]="{
+          'md:grid-cols-2 xl:grid-cols-3': viewMode() === 'grid',
+          'grid-cols-1': viewMode() === 'list'
+        }">
+        @for (item of sortedItems(); track item.product.id + item.queryParams.designId) {
+          <app-product-card [product]="item.product" [queryParams]="item.queryParams" [viewMode]="viewMode()" />
+        }
       </div>
     }
   </div>

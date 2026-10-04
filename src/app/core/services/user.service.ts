@@ -11,6 +11,54 @@ export interface User {
   phoneNumber: string;
 }
 
+export interface SignUpRequest {
+  firstName: string;
+  lastName: string;
+  emailId: string;
+  phoneNumber: string;
+  role: boolean;
+  password: string;
+}
+
+export interface SignUpResponse {
+  userId: string;
+  emailId: string;
+  role: boolean;
+}
+
+export interface LoginRequest {
+  emailId: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  userId: string;
+  firstName: string;
+  lastName: string;
+  emailId: string;
+  phoneNumber: string;
+  role: string;
+}
+
+export interface UpdateUserRequest {
+  firstName: string | null;
+  lastName: string | null;
+  phoneNumber: string | null;
+  emailId: string | null;
+  gender: string | null;
+}
+
+export interface UpdateUserResponse {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  emailId: string;
+  phoneNumber: string;
+  role: string;
+  gender: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private http = inject(HttpClient);
@@ -22,13 +70,18 @@ export class UserService {
   }
 
   // ✅ POST (create new user)
-  signUp(user: User): Observable<User> {
-    return this.http.post<User>(this.urlConstants.USERS, user);
+  signUp(user: SignUpRequest): Observable<SignUpResponse> {
+    return this.http.post<SignUpResponse>(this.urlConstants.USERS, user);
+  }
+
+  // ✅ POST (login existing user)
+  login(credentials: LoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(this.urlConstants.LOGIN, credentials);
   }
 
   // ✅ PUT (update existing user)
-  updateUser(id: number, user: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${environment.apiUrl}/users/${id}`, user);
+  updateUser(userId: string, user: UpdateUserRequest): Observable<UpdateUserResponse> {
+    return this.http.put<UpdateUserResponse>(this.urlConstants.updateUser(userId), user);
   }
 
   // ✅ DELETE (remove user)

@@ -1,14 +1,13 @@
 <div class="min-h-screen bg-[#fefaf4] text-slate-800 pt-24">
-  <app-header (menuToggle)="toggleMenu()" (cartToggle)="toggleCart()"></app-header>
+  <app-header (cartToggle)="toggleCart()"></app-header>
   <!-- Backdrop overlay -->
-  <div *ngIf="sideMenuVisible || sideCartVisible"
+  <div *ngIf="sideCartVisible"
        class="fixed inset-0 z-30 "
        (click)="closeAll()">
   </div>
-  <app-side-menu *ngIf="sideMenuVisible" (menuToggle)="toggleMenu()"></app-side-menu>
   <app-side-cart *ngIf="sideCartVisible" (cartToggle)="toggleCart()"></app-side-cart>
   <app-auth-modal></app-auth-modal>
-  <app-user-dropdown></app-user-dropdown>
+  <p-toast position="top-right"></p-toast>
 
   <main class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
     <router-outlet></router-outlet>
