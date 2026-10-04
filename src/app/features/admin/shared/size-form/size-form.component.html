@@ -1,0 +1,40 @@
+@let s = size();
+<div class="rounded-lg border border-blue-200 bg-blue-50/40 p-3">
+  <div class="mb-2 flex items-center justify-between">
+    <p class="text-xs font-semibold uppercase tracking-wider text-blue-700">Size</p>
+    @if (removable()) {
+      <button type="button" class="text-gray-400 hover:text-gray-700" title="Remove size"
+              (click)="removed.emit()">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    }
+  </div>
+  <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <label class="text-xs text-gray-600">Size Name
+      <input type="text" [(ngModel)]="s.sizeName" class="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm" />
+    </label>
+    <label class="text-xs text-gray-600">Length (cm)
+      <input type="number" min="0" [(ngModel)]="s.length" class="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm" />
+    </label>
+    <label class="text-xs text-gray-600">Breadth (cm)
+      <input type="number" min="0" [(ngModel)]="s.breadth" class="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm" />
+    </label>
+    <label class="text-xs text-gray-600">Height (cm)
+      <input type="number" min="0" [(ngModel)]="s.height" class="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm" />
+    </label>
+    <label class="text-xs text-gray-600">Weight (g)
+      <input type="number" min="0" [(ngModel)]="s.weight" class="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm" />
+    </label>
+    <label class="text-xs text-gray-600">Base Price (₹)
+      <input type="number" min="0" [(ngModel)]="s.basePrice" class="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm" />
+    </label>
+    <label class="text-xs text-gray-600">MRP (₹)
+      <input type="number" min="0" [(ngModel)]="s.mrp" class="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm" />
+    </label>
+    <label class="text-xs text-gray-600">Quantity
+      <input type="number" min="0" [(ngModel)]="s.quantity" class="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm" />
+    </label>
+  </div>
+</div>

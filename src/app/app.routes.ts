@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from './core/guards/admin.guard';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -14,8 +16,17 @@ export const routes: Routes = [
     loadComponent: () => import('./features/product-detail/product-detail.component').then((m) => m.ProductDetailComponent)
   },
   {
+    path: 'products-by-category/:categoryId',
+    loadComponent: () => import('./features/products-by-category/products-by-category.component').then((m) => m.ProductsByCategoryComponent)
+  },
+  {
     path: 'wishlist',
     loadComponent: () => import('./features/wishlist/wishlist.component').then((m) => m.WishlistComponent)
+  },
+  {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/profile/profile.component').then((m) => m.ProfileComponent)
   },
   {
     path: 'checkout',
@@ -35,6 +46,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
+    canActivate: [adminGuard],
     loadComponent: () => import('./features/admin/admin-layout/admin-layout.component').then((m) => m.AdminLayoutComponent),
     children: [
       {

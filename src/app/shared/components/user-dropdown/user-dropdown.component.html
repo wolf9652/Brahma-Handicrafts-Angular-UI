@@ -1,9 +1,10 @@
-<div *ngIf="authService.isUserDropdownOpen()" class="fixed right-4 top-16 z-50 w-56 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
-  <div class="mb-3 text-sm text-slate-600">
-    <p class="font-semibold text-slate-900">{{ authService.userName() }}</p>
-    <p>{{ authService.userEmail() }}</p>
+<div *ngIf="authService.isUserDropdownOpen() && authService.session() as session" class="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+  <div class="mb-3 space-y-1 text-sm text-slate-600">
+    <p class="font-semibold text-slate-900">{{ session.firstName }} {{ session.lastName }}</p>
+    <p>{{ session.emailId }}</p>
+    <p *ngIf="session.phoneNumber">{{ session.phoneNumber }}</p>
   </div>
-  <button type="button" class="w-full rounded-full border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700" (click)="authService.logout()">
+  <button type="button" class="w-full rounded-full border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700" (click)="signOut()">
     Sign out
   </button>
 </div>

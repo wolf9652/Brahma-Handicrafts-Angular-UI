@@ -7,40 +7,125 @@
       </a>
     </nav>
 
-    @if (product(); as currentProduct) {
+    @if (mode() === 'api') {
+      @if (design(); as currentDesign) {
+        <div class="overflow-hidden rounded-2xl bg-white shadow-lg">
+          <div class="grid gap-8 p-6 lg:grid-cols-2 lg:p-8">
+            <div>
+              <app-image-gallery [images]="sortedImageUrls()"
+                                 [alt]="currentDesign.productName + ' ' + currentDesign.designName"
+                                 [(selectedIndex)]="selectedImage" />
+            </div>
+
+            <div>
+              <div class="mb-4 flex items-start justify-between pr-2">
+                <div>
+                  <h1 class="mb-2 text-3xl font-bold text-gray-900">{{ currentDesign.productName }} {{ currentDesign.designName }}</h1>
+                  @if (categoryName()) {
+                    <p class="text-gray-600">{{ categoryName() }}</p>
+                  }
+                </div>
+              </div>
+
+              <div class="mb-6 flex items-center gap-4">
+                @if (selectedSize(); as size) {
+                  <span class="text-3xl font-bold text-gray-900">₹{{ size.basePrice }}/-</span>
+                  <span class="text-xl text-gray-500 line-through">₹{{ size.mrp }}</span>
+                } @else {
+                  <span class="text-3xl font-bold text-gray-900">₹{{ currentDesign.estimatedPrice }}/-</span>
+                }
+              </div>
+
+              <p class="mb-6 text-gray-700">{{ currentDesign.designDescription }}</p>
+
+              @if (currentDesign.sizes.length) {
+                <div class="mb-6">
+                  <label class="mb-2 block text-sm font-medium text-gray-700">Size</label>
+                  <div class="flex gap-2">
+                    @for (size of currentDesign.sizes; track size.sizeId) {
+                      <button type="button" class="rounded-lg border px-4 py-2 transition hover:bg-[#e2cba9]/60 hover:scale-105 hover:shadow-sm"
+                              [class.bg-[#e2cba9]/40]="selectedSize()?.sizeId === size.sizeId"
+                              [class.border-[#b08c57]]="selectedSize()?.sizeId === size.sizeId"
+                              [class.font-semibold]="selectedSize()?.sizeId === size.sizeId"
+                              [class.border-gray-300]="selectedSize()?.sizeId !== size.sizeId"
+                              (click)="selectSize(size)">
+                        {{ size.sizeName }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (selectedSize(); as size) {
+                <div class="mb-6 text-gray-700">
+                  <div>L: {{ size.length }} cm, B: {{ size.breadth }} cm, H: {{ size.height }} cm</div>
+                  <div>W: {{ size.weight }} gm</div>
+                </div>
+              }
+
+              <div class="mb-6">
+                <label class="mb-2 block text-sm font-medium text-gray-700">Quantity</label>
+                <div class="flex w-1/4 overflow-hidden rounded-sm border border-[#b28f60] bg-transparent text-lg text-[#b28f60]">
+                  <button type="button" class="flex-1 py-1 text-center hover:bg-[#e2cba9]" (click)="decreaseQuantity()">−</button>
+                  <div class="flex-1 py-1 text-center">{{ quantity() }}</div>
+                  <button type="button" class="flex-1 py-1 text-center hover:bg-[#e2cba9]" (click)="increaseQuantity()">+</button>
+                </div>
+              </div>
+
+              <div class="mb-6 flex flex-col gap-4 sm:flex-row">
+                <button type="button" class="flex-1 rounded-full border border-[#b08c57] bg-transparent px-6 py-3 font-medium text-gray-600 transition hover:bg-[#2e2e2e] hover:text-[#e8dac3]" (click)="toggleWishlist()">
+                  <i [class.pi-heart]="!isInWishlist()" [class.pi-heart-fill]="isInWishlist()" [class.text-gray-600]="!isInWishlist()" [class.text-red-500]="isInWishlist()" class="pi"></i>
+                </button>
+                <button type="button" class="flex-1 gap-2 rounded-full border border-[#b08c57] bg-transparent px-6 py-3 font-medium text-[#b08c57] transition hover:bg-[#2e2e2e] hover:text-[#e8dac3] flex items-center justify-center" (click)="shareProduct()">
+                  <i class="pi pi-share-alt"></i><span>Share</span>
+                </button>
+              </div>
+              <div class="mb-6 flex flex-col gap-4 sm:flex-row">
+                <button type="button" class="flex-1 rounded-full border border-[#b08c57] bg-transparent px-6 py-3 font-medium text-[#b08c57] transition hover:bg-[#2e2e2e] hover:text-[#e8dac3]" (click)="addToCart()">
+                  Add to Cart
+                </button>
+                <a routerLink="/checkout" class="rounded-full border-2 border-[#b08c57] bg-[#2e2e2e] px-6 py-3 text-center font-medium text-[#e8dac3] transition hover:bg-transparent hover:text-[#2e2e2e]" (click)="addToCart()">
+                  Buy Now
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      } @else if (designNotFound()) {
+        <div class="rounded-2xl border border-dashed border-[#b08c57] bg-white p-8 text-center text-gray-700">
+          Product not found.
+        </div>
+      } @else {
+        <div class="rounded-2xl border border-dashed border-[#b08c57] bg-white p-8 text-center text-gray-700">
+          Loading product...
+        </div>
+      }
+    } @else if (product(); as currentProduct) {
       <div class="overflow-hidden rounded-2xl bg-white shadow-lg">
         <div class="grid gap-8 p-6 lg:grid-cols-2 lg:p-8">
           <div>
-            <img [src]="currentProduct.images[selectedImage()] || currentProduct.image" [alt]="currentProduct.name" class="h-96 w-full rounded-lg object-cover" />
-
-            @if (currentProduct.images.length > 1) {
-              <div class="mt-4 flex gap-2">
-                @for (image of currentProduct.images; track image; let index = $index) {
-                  <button type="button" class="h-20 w-20 overflow-hidden rounded-lg border-2" [class.border-[#b08c57]]="selectedImage() === index" [class.border-gray-200]="selectedImage() !== index" (click)="selectImage(index)">
-                    <img [src]="image" [alt]="currentProduct.name + ' ' + (index + 1)" class="h-full w-full object-cover" />
-                  </button>
-                }
-              </div>
-            }
+            <app-image-gallery [images]="legacyImages()"
+                               [alt]="selectedVariant()?.name || currentProduct.name"
+                               [(selectedIndex)]="selectedImage" />
           </div>
 
           <div>
             <div class="mb-4 flex items-start justify-between pr-2">
               <div>
-                <h1 class="mb-2 text-3xl font-bold text-gray-900">{{ currentProduct.name }}</h1>
+                <h1 class="mb-2 text-3xl font-bold text-gray-900">{{ selectedVariant()?.name || currentProduct.name }}</h1>
                 <p class="text-gray-600">{{ currentProduct.category }}</p>
               </div>
-              
+
             </div>
 
             <div class="mb-6 flex items-center gap-4">
-              <span class="text-3xl font-bold text-gray-900">₹{{ currentProduct.price }}</span>
+              <span class="text-3xl font-bold text-gray-900">₹{{ selectedVariant()?.price || currentProduct.price }}/-</span>
               @if (currentProduct.originalPrice) {
                 <span class="text-xl text-gray-500 line-through">₹{{ currentProduct.originalPrice }}</span>
               }
             </div>
 
-            <p class="mb-6 text-gray-700">{{ currentProduct.description }}</p>
+            <p class="mb-6 text-gray-700">{{ selectedVariant()?.description || currentProduct.description }}</p>
 
             <div class="mb-6">
               <h3 class="mb-3 font-semibold text-gray-900">Features</h3>
@@ -54,13 +139,14 @@
               </ul>
             </div>
 
-            @if (currentProduct.colors?.length) {
+            @if (currentProduct.designs?.length) {
               <div class="mb-6">
-                <label class="mb-2 block text-sm font-medium text-gray-700">Color</label>
+                <label class="mb-2 block text-sm font-medium text-gray-700">Design</label>
                 <div class="flex gap-2">
-                  @for (color of currentProduct.colors; track color) {
-                    <button type="button" class="rounded-lg border px-4 py-2 transition hover:bg-[#e2cba9]/60 hover:scale-105 hover:shadow-sm" [class.bg-[#e2cba9]/40]="selectedColor() === color"  [class.border-[#b08c57]]="selectedColor() === color" [class.font-semibold]="selectedColor() === color" [class.border-gray-300]="selectedColor() !== color" (click)="selectColor(color)">
-                      {{ color }}
+                  @for (design of currentProduct.designs; track design) {
+                    <button type="button" class="rounded-lg border px-4 py-2 transition hover:bg-[#e2cba9]/60 hover:scale-105 hover:shadow-sm" [class.bg-[#e2cba9]/40]="selectedDesign() === design"  [class.border-[#b08c57]]="selectedDesign() === design
+                    " [class.font-semibold]="selectedDesign() === design" [class.border-gray-300]="selectedDesign() !== design" (click)="selectDesign(design)">
+                      {{ design }}
                     </button>
                   }
                 </div>

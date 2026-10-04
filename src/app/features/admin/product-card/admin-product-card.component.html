@@ -1,0 +1,226 @@
+<div class="rounded-lg border border-gray-200 bg-white shadow-sm transition"
+     [class.opacity-50]="!product().isActive">
+  <button type="button"
+          class="flex w-full items-center gap-6 p-4 text-left"
+          (click)="toggleExpand()">
+    <img [src]="imageUrl()" [alt]="product().productName"
+         class="h-16 w-16 shrink-0 rounded-md border border-gray-200 object-cover" />
+
+    <div class="grid flex-1 grid-cols-[2fr_1.2fr_1fr_1fr] items-center gap-x-6 text-sm text-gray-800">
+      <span class="truncate font-semibold text-gray-900">{{ product().productName }}</span>
+      <span class="truncate text-gray-600">{{ product().categoryName }}</span>
+      <span>{{ product().designCount }}</span>
+      <span>{{ product().totalQuantity }}</span>
+    </div>
+
+    <svg class="h-5 w-5 shrink-0 text-gray-500 transition-transform"
+         [class.rotate-180]="expanded()"
+         viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+    </svg>
+  </button>
+
+  @if (expanded()) {
+    <div class="border-t border-gray-100 p-4">
+      @if (detailLoading()) {
+        <p class="text-sm text-gray-500">Loading product details...</p>
+      } @else if (view(); as v) {
+
+        @if (saveErrors().length > 0) {
+          <ul class="mb-4 list-disc rounded-md border border-red-200 bg-red-50 py-2 pl-8 pr-3 text-sm text-red-600">
+            @for (error of saveErrors(); track error) {
+              <li>{{ error }}</li>
+            }
+          </ul>
+        }
+
+        <!-- Action bar -->
+        <div class="mb-4 flex items-center justify-end gap-2">
+          @if (editing()) {
+            <button type="button" class="rounded-md border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    [disabled]="saving()"
+                    (click)="cancelEdit()">Cancel</button>
+            <button type="button" class="rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
+                    [disabled]="saving()"
+                    (click)="saveEdit()">{{ saving() ? 'Saving...' : 'Save' }}</button>
+          } @else if (product().isActive) {
+            <button type="button" class="rounded-md border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    (click)="startEdit()">Edit</button>
+          }
+        </div>
+
+        <!-- Product info -->
+        <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">Product Name</label>
+            @if (editing()) {
+              <input type="text" [(ngModel)]="draft.productName"
+                     class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+            } @else {
+              <p class="text-sm text-gray-900">{{ v.productName }}</p>
+            }
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">Category</label>
+            @if (editing()) {
+              <input type="text" [(ngModel)]="draft.categoryName"
+                     class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+            } @else {
+              <p class="text-sm text-gray-900">{{ v.categoryName }}</p>
+            }
+          </div>
+        </div>
+
+        <!-- Designs -->
+        <div class="flex flex-col gap-6">
+          @for (design of designs; track design.designId; let di = $index) {
+            <section class="rounded-lg border border-gray-200 p-4">
+
+              @if (editing()) {
+                <div class="mb-3 flex justify-end">
+                  <button type="button" class="flex items-center gap-1 text-sm text-gray-500 hover:text-red-600"
+                          (click)="removeDesign(di)">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" />
+                    </svg>
+                    Remove design
+                  </button>
+                </div>
+              }
+
+              <!-- Design info -->
+              <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-[2fr_3fr_1fr]">
+                <div>
+                  <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">Design Name</label>
+                  @if (editing()) {
+                    <input type="text" [(ngModel)]="design.designName"
+                           class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+                  } @else {
+                    <p class="text-sm font-semibold text-gray-900">{{ design.designName }}</p>
+                  }
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">Description</label>
+                  @if (editing()) {
+                    <textarea rows="2" [(ngModel)]="design.designDescription"
+                              class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"></textarea>
+                  } @else {
+                    <p class="text-sm text-gray-600">{{ design.designDescription }}</p>
+                  }
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">Estimated Price (₹)</label>
+                  @if (editing()) {
+                    <input type="number" min="0" [(ngModel)]="design.estimatedPrice"
+                           class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+                  } @else {
+                    <p class="text-sm text-gray-900">₹{{ design.estimatedPrice }}</p>
+                  }
+                </div>
+              </div>
+
+              <!-- Images -->
+              <div class="mb-4">
+                <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">Images</p>
+                <app-image-uploader [(images)]="design.images" [editable]="editing()" />
+              </div>
+
+              <!-- Sizes -->
+              <div>
+                <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">Sizes</p>
+                @if (design.sizes.length === 0 && design.newSizes.length === 0) {
+                  <p class="text-sm text-gray-500">No sizes added.</p>
+                } @else if (design.sizes.length > 0) {
+                  <div class="overflow-x-auto">
+                    <table class="w-full min-w-[640px] text-left text-sm">
+                      <thead class="text-xs uppercase tracking-wider text-gray-500">
+                        <tr class="border-b border-gray-200">
+                          <th class="py-2 pr-3 font-semibold">Size</th>
+                          <th class="py-2 pr-3 font-semibold">Length (cm)</th>
+                          <th class="py-2 pr-3 font-semibold">Breadth (cm)</th>
+                          <th class="py-2 pr-3 font-semibold">Height (cm)</th>
+                          <th class="py-2 pr-3 font-semibold">Weight (g)</th>
+                          <th class="py-2 pr-3 font-semibold">Base Price (₹)</th>
+                          <th class="py-2 pr-3 font-semibold">MRP (₹)</th>
+                          <th class="py-2 pr-3 font-semibold">Quantity</th>
+                          @if (editing()) {
+                            <th class="sr-only">Actions</th>
+                          }
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (size of design.sizes; track $index; let si = $index) {
+                          <tr class="border-b border-gray-100 text-gray-800">
+                            @if (editing()) {
+                              <td class="py-2 pr-3"><input type="text" [(ngModel)]="size.sizeName" class="w-24 rounded border border-gray-300 px-2 py-1" /></td>
+                              <td class="py-2 pr-3"><input type="number" min="0" [(ngModel)]="size.length" class="w-20 rounded border border-gray-300 px-2 py-1" /></td>
+                              <td class="py-2 pr-3"><input type="number" min="0" [(ngModel)]="size.breadth" class="w-20 rounded border border-gray-300 px-2 py-1" /></td>
+                              <td class="py-2 pr-3"><input type="number" min="0" [(ngModel)]="size.height" class="w-20 rounded border border-gray-300 px-2 py-1" /></td>
+                              <td class="py-2 pr-3"><input type="number" min="0" [(ngModel)]="size.weight" class="w-20 rounded border border-gray-300 px-2 py-1" /></td>
+                              <td class="py-2 pr-3"><input type="number" min="0" [(ngModel)]="size.basePrice" class="w-24 rounded border border-gray-300 px-2 py-1" /></td>
+                              <td class="py-2 pr-3"><input type="number" min="0" [(ngModel)]="size.mrp" class="w-24 rounded border border-gray-300 px-2 py-1" /></td>
+                              <td class="py-2 pr-3"><input type="number" min="0" [(ngModel)]="size.quantity" class="w-20 rounded border border-gray-300 px-2 py-1" /></td>
+                              <td class="py-2">
+                                <button type="button" class="text-gray-400 hover:text-red-600" title="Remove size"
+                                        (click)="removeSize(di, si)">
+                                  <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" />
+                                  </svg>
+                                </button>
+                              </td>
+                            } @else {
+                              <td class="py-2 pr-3 font-medium">{{ size.sizeName }}</td>
+                              <td class="py-2 pr-3">{{ size.length }}</td>
+                              <td class="py-2 pr-3">{{ size.breadth }}</td>
+                              <td class="py-2 pr-3">{{ size.height }}</td>
+                              <td class="py-2 pr-3">{{ size.weight }}</td>
+                              <td class="py-2 pr-3">₹{{ size.basePrice }}</td>
+                              <td class="py-2 pr-3">₹{{ size.mrp }}</td>
+                              <td class="py-2 pr-3">{{ size.quantity }}</td>
+                            }
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+
+                <!-- New size forms (edit mode only) -->
+                @if (editing()) {
+                  <div class="mt-3 flex flex-col gap-3">
+                    @for (newSize of design.newSizes; track $index; let ni = $index) {
+                      <app-size-form [size]="newSize" (removed)="removeNewSize(di, ni)" />
+                    }
+                  </div>
+
+                  <button type="button" class="mt-3 text-sm font-medium text-blue-600 hover:underline"
+                          (click)="addNewSize(di)">+ Add size</button>
+                }
+              </div>
+            </section>
+          }
+
+          <!-- Add design (edit mode only) -->
+          @if (editing()) {
+            @if (addingDesign()) {
+              <section class="rounded-lg border border-blue-200 bg-blue-50/30 p-4">
+                <p class="mb-4 text-xs font-semibold uppercase tracking-wider text-blue-700">New Design</p>
+                <app-design-form [design]="newDesign" [submitted]="newDesignSubmitted()" />
+                <div class="mt-4 flex justify-end gap-2">
+                  <button type="button" class="rounded-md border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                          (click)="cancelAddDesign()">Cancel</button>
+                  <button type="button" class="rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+                          (click)="saveNewDesign()">Save design</button>
+                </div>
+              </section>
+            } @else {
+              <button type="button"
+                      class="self-start rounded-md border border-dashed border-gray-400 px-4 py-2 text-sm font-medium text-gray-700 hover:border-blue-500 hover:text-blue-600"
+                      (click)="openAddDesign()">+ Add design</button>
+            }
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

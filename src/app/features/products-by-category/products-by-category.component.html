@@ -1,0 +1,19 @@
+<section class="min-h-screen px-4 py-10 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-[#2e2e2e]">{{ categoryName() || 'Products' }}</h1>
+    </div>
+
+    @if (loading()) {
+      <p class="text-gray-600">Loading products...</p>
+    } @else if (cardItems().length === 0) {
+      <p class="text-gray-600">No products found in this category.</p>
+    } @else {
+      <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        @for (item of cardItems(); track item.product.id + item.queryParams.designId) {
+          <app-product-card [product]="item.product" [queryParams]="item.queryParams" />
+        }
+      </div>
+    }
+  </div>
+</section>
