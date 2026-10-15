@@ -6,27 +6,143 @@
   </div>
 
   <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-    <div class="overflow-hidden rounded-lg bg-white shadow-sm">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Order</th>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Customer</th>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Total</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200 bg-white">
-          @for (order of ordersList; track order.id) {
-            <tr>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ order.orderNumber }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ order.customerInfo.name }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ order.paymentStatus }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{{ order.total.toFixed(2) }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
+    <div class="mb-4 rounded-lg border border-gray-200 bg-white px-6 py-3 shadow-sm">
+      <div class="grid grid-cols-[2fr_1.2fr_1.5fr_1fr_1fr] items-center gap-x-6 text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <span>Order ID</span>
+        <span>Date</span>
+        <span>Customer</span>
+        <span>Status</span>
+        <span>Total</span>
+      </div>
     </div>
+
+    @if (loading()) {
+      <p class="text-sm text-gray-600">Loading orders...</p>
+    } @else if (orders().length === 0) {
+      <p class="text-sm text-gray-600">No orders found.</p>
+    } @else {
+      <div class="flex flex-col gap-4">
+        @for (entry of orders(); track entry.order.orderId) {
+          <div class="rounded-lg border border-gray-200 bg-white shadow-sm">
+            <button type="button"
+                    class="flex w-full items-center gap-6 p-4 text-left"
+                    (click)="toggleOrder(entry.order.orderId)">
+              <div class="grid flex-1 grid-cols-[2fr_1.2fr_1.5fr_1fr_1fr] items-center gap-x-6 text-sm text-gray-800">
+                <span class="truncate font-semibold text-gray-900">{{ entry.order.orderId }}</span>
+                <span class="truncate text-gray-600">{{ entry.order.orderDate | date: 'mediumDate' }}</span>
+                <span class="truncate text-gray-600">{{ entry.fullName }}</span>
+                <span class="w-fit rounded-full bg-amber-100 px-3 py-0.5 text-xs font-semibold text-amber-800">{{ entry.order.orderStatus }}</span>
+                <span>₹{{ entry.order.grandTotal.toFixed(2) }}</span>
+              </div>
+
+              <svg class="h-5 w-5 shrink-0 text-gray-500 transition-transform"
+                   [class.rotate-180]="expandedOrderId() === entry.order.orderId"
+                   viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+              </svg>
+            </button>
+
+            @if (expandedOrderId() === entry.order.orderId) {
+              <div class="border-t border-gray-100 p-4">
+                <div class="mb-4 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Customer</p>
+                    <p class="text-sm text-gray-900">{{ entry.fullName }}</p>
+                    <p class="text-sm text-gray-600">{{ entry.emailId }}</p>
+                    <p class="text-sm text-gray-600">{{ entry.phoneNumber }}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Order Info</p>
+                    <p class="text-sm text-gray-900">Date: {{ entry.order.orderDate | date: 'medium' }}</p>
+                    <p class="text-sm text-gray-900">Tracking No: {{ entry.order.trackingNumber }}</p>
+                    @if (entry.order.gstNumber) {
+                      <p class="text-sm text-gray-900">GST Number: {{ entry.order.gstNumber }}</p>
+                    }
+                  </div>
+                </div>
+
+                <div class="mb-4 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <h3 class="mb-1 text-sm font-semibold text-gray-900">Shipping Address</h3>
+                    <p class="text-sm text-gray-600">
+                      {{ entry.order.shippingAddress.customerName }}, {{ entry.order.shippingAddress.addressLine1 }}, {{ entry.order.shippingAddress.city }}, {{ entry.order.shippingAddress.state }}, {{ entry.order.shippingAddress.postalCode }}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 class="mb-1 text-sm font-semibold text-gray-900">Billing Address</h3>
+                    @if (isBillingSameAsShipping(entry.order)) {
+                      <p class="text-sm text-gray-600">Same as shipping address</p>
+                    } @else {
+                      <p class="text-sm text-gray-600">
+                        {{ entry.order.billingAddress.customerName }}, {{ entry.order.billingAddress.addressLine1 }}, {{ entry.order.billingAddress.city }}, {{ entry.order.billingAddress.state }}, {{ entry.order.billingAddress.postalCode }}
+                      </p>
+                    }
+                  </div>
+                </div>
+
+                <div class="mb-4 flex flex-col gap-3">
+                  @for (item of entry.order.items; track item.orderItemId) {
+                    <div class="flex items-center gap-3">
+                      <img [src]="orderItemImageUrl(item)" [alt]="item.image.altText" class="h-14 w-14 shrink-0 rounded-lg border border-gray-200 object-cover" />
+                      <div class="flex-1">
+                        <p class="font-medium text-gray-900">{{ item.productName }} <span class="text-gray-500">({{ item.designName }})</span></p>
+                        <p class="text-sm text-gray-600">{{ item.sizeName }} &middot; Qty: {{ item.quantity }} &middot; ₹{{ item.basePrice.toFixed(2) }} each</p>
+                      </div>
+                      <p class="font-medium text-gray-900">₹{{ item.subTotal.toFixed(2) }}</p>
+                    </div>
+                  }
+                </div>
+
+                <div class="space-y-1 border-t border-gray-100 pt-3 text-sm text-gray-700">
+                  <div class="flex justify-between">
+                    <span>Taxable Amount</span>
+                    <span>₹{{ entry.order.itemsSubTotal.toFixed(2) }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>IGST</span>
+                    <span>₹{{ entry.order.igst.toFixed(2) }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>CGST</span>
+                    <span>₹{{ entry.order.cgst.toFixed(2) }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>SGST</span>
+                    <span>₹{{ entry.order.sgst.toFixed(2) }}</span>
+                  </div>
+                  <div class="flex justify-between font-medium text-gray-900">
+                    <span>Total Tax Charges</span>
+                    <span>₹{{ entry.order.totalTaxCharges.toFixed(2) }}</span>
+                  </div>
+                  <div class="flex justify-between border-t border-gray-100 pt-2 text-base font-semibold text-gray-900">
+                    <span>Grand Total</span>
+                    <span>₹{{ entry.order.grandTotal.toFixed(2) }}</span>
+                  </div>
+                </div>
+
+                @if (nextStatus(entry.order); as next) {
+                  <div class="mt-4 flex gap-3 border-t border-gray-100 pt-4">
+                    <button type="button"
+                            class="rounded-full bg-gray-900 px-6 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                            [disabled]="updatingOrderId() === entry.order.orderId"
+                            (click)="updateStatus(entry.order.orderId, next)">
+                      {{ updatingOrderId() === entry.order.orderId ? 'Updating...' : next }}
+                    </button>
+                    @if (canCancel(entry.order)) {
+                      <button type="button"
+                              class="rounded-full border border-red-400 px-6 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                              [disabled]="updatingOrderId() === entry.order.orderId"
+                              (click)="updateStatus(entry.order.orderId, 'Cancelled')">
+                        Cancel
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
   </div>
 </div>

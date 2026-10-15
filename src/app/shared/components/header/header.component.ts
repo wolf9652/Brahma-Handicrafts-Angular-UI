@@ -35,7 +35,8 @@ export class HeaderComponent implements OnInit {
     { label: 'Products', path: '/admin/products' },
     { label: 'Orders', path: '/admin/orders' },
     { label: 'Customers', path: '/admin/customers' },
-    { label: 'Payments', path: '/admin/payments' }
+    { label: 'Payments', path: '/admin/payments' },
+    { label: 'Promotions', path: '/admin/promotions' }
   ];
 
   protected readonly categoryGroups = computed<CategoryGroup[]>(() => {

@@ -1,0 +1,99 @@
+<section class="min-h-screen bg-[#e8dac3] px-4 py-10 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-4xl">
+    @if (order(); as o) {
+      <div class="rounded-2xl bg-white p-8 shadow-sm">
+        <div class="mb-8 text-center">
+          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl text-green-600">
+            <i class="pi pi-check"></i>
+          </div>
+          <h1 class="text-2xl font-bold text-gray-900">Order Placed Successfully!</h1>
+          <p class="mt-1 text-sm text-gray-600">Thank you for your purchase.</p>
+        </div>
+
+        <div class="mb-8 grid gap-4 rounded-xl bg-[#f3e6cf] p-5 sm:grid-cols-2">
+          <div>
+            <p class="text-xs uppercase tracking-wide text-gray-600">Order ID</p>
+            <p class="font-medium text-gray-900">{{ o.orderId }}</p>
+          </div>
+          <div>
+            <p class="text-xs uppercase tracking-wide text-gray-600">Tracking Number</p>
+            <p class="font-medium text-gray-900">{{ o.trackingNumber }}</p>
+          </div>
+          <div>
+            <p class="text-xs uppercase tracking-wide text-gray-600">Status</p>
+            <p class="font-medium text-gray-900">{{ o.orderStatus }}</p>
+          </div>
+          <div>
+            <p class="text-xs uppercase tracking-wide text-gray-600">Order Date</p>
+            <p class="font-medium text-gray-900">{{ o.orderDate | date: 'medium' }}</p>
+          </div>
+        </div>
+
+        <div class="mb-8 grid gap-6 sm:grid-cols-2">
+          <div>
+            <h2 class="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-700">Shipping Address</h2>
+            <div class="rounded-lg border border-gray-200 p-4 text-sm text-gray-700">
+              <p class="font-medium text-gray-900">{{ o.shippingAddress.customerName }} &nbsp; {{ o.shippingAddress.customerPhoneNumber }}</p>
+              <p class="mt-1">{{ o.shippingAddress.addressLine1 }}, {{ o.shippingAddress.city }}, {{ o.shippingAddress.state }}, {{ o.shippingAddress.postalCode }}, {{ o.shippingAddress.country }}</p>
+            </div>
+          </div>
+          <div>
+            <h2 class="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-700">Billing Address</h2>
+            <div class="rounded-lg border border-gray-200 p-4 text-sm text-gray-700">
+              <p class="font-medium text-gray-900">{{ o.billingAddress.customerName }} &nbsp; {{ o.billingAddress.customerPhoneNumber }}</p>
+              <p class="mt-1">{{ o.billingAddress.addressLine1 }}, {{ o.billingAddress.city }}, {{ o.billingAddress.state }}, {{ o.billingAddress.postalCode }}, {{ o.billingAddress.country }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-700">Items</h2>
+          <div class="divide-y divide-gray-200 rounded-lg border border-gray-200">
+            @for (item of o.items; track item.orderItemId) {
+              <div class="flex items-center justify-between gap-4 p-4">
+                <div>
+                  <p class="font-medium text-gray-900">{{ item.productName }} <span class="text-gray-500">({{ item.designName }})</span></p>
+                  <p class="text-sm text-gray-600">{{ item.sizeName }} &middot; Qty: {{ item.quantity }} &middot; ₹{{ item.basePrice.toFixed(2) }} each</p>
+                </div>
+                <p class="font-medium text-gray-900">₹{{ item.subTotal.toFixed(2) }}</p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="space-y-2 border-t pt-4 text-sm text-gray-700">
+          <div class="flex justify-between">
+            <span>Taxable Amount</span>
+            <span>₹{{ o.itemsSubTotal.toFixed(2) }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>IGST</span>
+            <span>₹{{ o.igst.toFixed(2) }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>CGST</span>
+            <span>₹{{ o.cgst.toFixed(2) }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>SGST</span>
+            <span>₹{{ o.sgst.toFixed(2) }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Total Tax</span>
+            <span>₹{{ o.totalTaxCharges.toFixed(2) }}</span>
+          </div>
+          <div class="flex justify-between border-t pt-2 text-lg font-semibold text-gray-900">
+            <span>Grand Total</span>
+            <span>₹{{ o.grandTotal.toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <div class="mt-8 text-center">
+          <a routerLink="/products" class="inline-flex items-center justify-center rounded-full border-2 border-[#b08c57] bg-[#2e2e2e] px-8 py-3 font-medium text-[#e8dac3] transition hover:bg-transparent hover:text-[#2e2e2e]">
+            Continue Shopping
+          </a>
+        </div>
+      </div>
+    }
+  </div>
+</section>

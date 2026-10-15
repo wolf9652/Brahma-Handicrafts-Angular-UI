@@ -6,6 +6,7 @@ import { WishlistService } from '../../core/services/wishlist.service';
 import { UserService } from '../../core/services/user.service';
 import { Category, CategoryService } from '../../core/services/category.service';
 import { AuthService } from '../../core/services/auth.service';
+import { PromotionPricingService } from '../../core/services/promotion-pricing.service';
 import { ApiUrlConstants } from '../../core/constants/apiUrl.constants';
 import { buildAssetUrl } from '../../core/utils/image-url.util';
 import { RatingModule } from 'primeng/rating';
@@ -78,7 +79,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     private readonly categoryService: CategoryService,
     private readonly wishlistService: WishlistService,
     private readonly authService: AuthService,
-    private readonly urlConstants: ApiUrlConstants
+    private readonly urlConstants: ApiUrlConstants,
+    private readonly promotionPricingService: PromotionPricingService
   ) {
     this.products.set(this.productService.getProducts());
 
@@ -158,7 +160,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       title: `${product.productName} (${product.designName})`,
       categoryName: product.categoryName,
       description: product.designDescription,
-      price: product.estimatedPrice,
+      price: this.promotionPricingService.applyDiscount(product.productId, product.estimatedPrice),
       image: buildAssetUrl(this.urlConstants.origin, product.image?.url)
     };
   }

@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { CartService } from '../../core/services/cart.service';
 import { WishlistEntry, WishlistService } from '../../core/services/wishlist.service';
 import { AuthService } from '../../core/services/auth.service';
+import { PromotionPricingService } from '../../core/services/promotion-pricing.service';
 
 @Component({
   selector: 'app-wishlist',
@@ -17,9 +18,19 @@ export class WishlistComponent {
   constructor(
     private readonly wishlistService: WishlistService,
     private readonly cartService: CartService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly promotionPricingService: PromotionPricingService
   ) {
     this.wishlistEntries = this.wishlistService.entries;
+  }
+
+  protected discountedPrice(entry: WishlistEntry): number {
+    return this.promotionPricingService.applyDiscount(entry.product.id, entry.product.price);
+  }
+
+  protected discountedOriginalPrice(entry: WishlistEntry): number | undefined {
+    const originalPrice = entry.product.originalPrice;
+    return originalPrice === undefined ? undefined : this.promotionPricingService.applyDiscount(entry.product.id, originalPrice);
   }
 
   protected removeFromWishlist(entry: WishlistEntry): void {

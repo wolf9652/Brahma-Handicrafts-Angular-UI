@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DesignDetail, DesignSize, Product, ProductVariant, ProductService } from '../../core/services/product.service';
 import { ApiUrlConstants } from '../../core/constants/apiUrl.constants';
@@ -6,6 +6,7 @@ import { buildAssetUrl } from '../../core/utils/image-url.util';
 import { CartService } from '../../core/services/cart.service';
 import { WishlistService } from '../../core/services/wishlist.service';
 import { AuthService } from '../../core/services/auth.service';
+import { PromotionPricingService } from '../../core/services/promotion-pricing.service';
 import { ImageGalleryComponent } from '../../shared/components/image-gallery/image-gallery.component';
 
 type ViewMode = 'legacy' | 'api';
@@ -18,6 +19,8 @@ type ViewMode = 'legacy' | 'api';
   styleUrl: './product-detail.component.scss'
 })
 export class ProductDetailComponent {
+  private readonly promotionPricingService = inject(PromotionPricingService);
+
   protected readonly mode = signal<ViewMode>('legacy');
 
   // Legacy (static demo data) state — unchanged behavior.
@@ -154,6 +157,13 @@ export class ProductDetailComponent {
 
   protected selectSize(size: DesignSize): void {
     this.selectedSize.set(size);
+  }
+
+  // The price shown above Add to Cart reads size/currentDesign directly rather than through
+  // effectiveProduct(), so the discount is applied here too, keyed off the same productId.
+  protected discount(price: number): number {
+    const productId = this.mode() === 'api' ? this.design()?.productId : this.product()?.id;
+    return this.promotionPricingService.applyDiscount(productId, price);
   }
 
   protected increaseQuantity(): void {

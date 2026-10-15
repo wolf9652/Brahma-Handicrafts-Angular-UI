@@ -1,18 +1,23 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../core/services/auth.service';
 import { UpdateUserRequest, UserService } from '../../core/services/user.service';
 import { Address, AddressCreateRequest, AddressService, AddressUpdateRequest } from '../../core/services/address.service';
+import { Order, OrderService } from '../../core/services/order.service';
+import { INDIAN_STATES } from '../../core/data/indian-states';
+import { ApiUrlConstants } from '../../core/constants/apiUrl.constants';
+import { buildAssetUrl } from '../../core/utils/image-url.util';
 
-type ProfileTab = 'information' | 'addresses';
+type ProfileTab = 'information' | 'addresses' | 'orders';
 type Gender = 'Male' | 'Female';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, DatePipe],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
@@ -20,8 +25,10 @@ export class ProfileComponent {
   protected readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
   private readonly addressService = inject(AddressService);
+  private readonly orderService = inject(OrderService);
   private readonly messageService = inject(MessageService);
   private readonly router = inject(Router);
+  private readonly urlConstants = inject(ApiUrlConstants);
 
   protected readonly activeTab = signal<ProfileTab>('information');
 
@@ -54,9 +61,91 @@ export class ProfileComponent {
   protected readonly addrPostalCode = signal('');
   protected readonly addrCountry = signal('');
   protected readonly addrIsDefault = signal(false);
+  protected readonly indianStates = INDIAN_STATES;
+
+  // Orders — fetched fresh each time the My Orders tab is opened, not cached across visits.
+  protected readonly orders = signal<Order[]>([]);
+  protected readonly ordersLoading = signal(false);
+  protected readonly expandedOrderId = signal<string | null>(null);
+  protected readonly cancellingOrderId = signal<string | null>(null);
+
+  private static readonly CANCELLABLE_STATUSES = ['pending', 'confirmed', 'processing'];
 
   protected setTab(tab: ProfileTab): void {
     this.activeTab.set(tab);
+
+    if (tab === 'orders') {
+      this.loadOrders();
+    }
+  }
+
+  private loadOrders(): void {
+    const userId = this.authService.session()?.userId;
+    if (!userId) {
+      return;
+    }
+
+    this.ordersLoading.set(true);
+    this.orderService.getOrdersByUser(userId).subscribe({
+      next: (page) => {
+        this.orders.set(page.items);
+        this.ordersLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error fetching orders:', err);
+        this.ordersLoading.set(false);
+      }
+    });
+  }
+
+  protected toggleOrder(orderId: string): void {
+    this.expandedOrderId.set(this.expandedOrderId() === orderId ? null : orderId);
+  }
+
+  protected isBillingSameAsShipping(order: Order): boolean {
+    return order.billingAddressId === order.shippingAddressId;
+  }
+
+  protected orderItemImageUrl(item: Order['items'][number]): string {
+    return buildAssetUrl(this.urlConstants.origin, item.image?.url);
+  }
+
+  protected canCancelOrder(order: Order): boolean {
+    return ProfileComponent.CANCELLABLE_STATUSES.includes(order.orderStatus.toLowerCase());
+  }
+
+  protected canRequestRefund(order: Order): boolean {
+    return order.orderStatus.toLowerCase() === 'delivered';
+  }
+
+  protected cancelOrder(order: Order): void {
+    if (this.cancellingOrderId()) {
+      return;
+    }
+
+    this.cancellingOrderId.set(order.orderId);
+    this.orderService.updateOrderStatus(order.orderId, 'Cancelled').subscribe({
+      next: (response) => {
+        this.orders.update((list) =>
+          list.map((item) => (item.orderId === response.orderId ? { ...item, orderStatus: response.orderStatus } : item))
+        );
+        this.cancellingOrderId.set(null);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Order cancelled',
+          detail: 'Your order has been cancelled.'
+        });
+      },
+      error: (err) => {
+        console.error('Error cancelling order:', err);
+        this.cancellingOrderId.set(null);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Cancel failed',
+          detail: 'We could not cancel this order. Please try again.'
+        });
+      }
+    });
   }
 
   protected selectGender(value: Gender): void {

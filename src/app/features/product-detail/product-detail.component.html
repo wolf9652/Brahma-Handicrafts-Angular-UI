@@ -29,10 +29,10 @@
 
               <div class="mb-6 flex items-center gap-4">
                 @if (selectedSize(); as size) {
-                  <span class="text-3xl font-bold text-gray-900">₹{{ size.basePrice }}/-</span>
-                  <span class="text-xl text-gray-500 line-through">₹{{ size.mrp }}</span>
+                  <span class="text-3xl font-bold text-gray-900">₹{{ discount(size.basePrice) }}/-</span>
+                  <span class="text-xl text-gray-500 line-through">₹{{ discount(size.mrp) }}</span>
                 } @else {
-                  <span class="text-3xl font-bold text-gray-900">₹{{ currentDesign.estimatedPrice }}/-</span>
+                  <span class="text-3xl font-bold text-gray-900">₹{{ discount(currentDesign.estimatedPrice) }}/-</span>
                 }
               </div>
 
@@ -119,9 +119,9 @@
             </div>
 
             <div class="mb-6 flex items-center gap-4">
-              <span class="text-3xl font-bold text-gray-900">₹{{ selectedVariant()?.price || currentProduct.price }}/-</span>
+              <span class="text-3xl font-bold text-gray-900">₹{{ discount(selectedVariant()?.price || currentProduct.price) }}/-</span>
               @if (currentProduct.originalPrice) {
-                <span class="text-xl text-gray-500 line-through">₹{{ currentProduct.originalPrice }}</span>
+                <span class="text-xl text-gray-500 line-through">₹{{ discount(currentProduct.originalPrice) }}</span>
               }
             </div>
 

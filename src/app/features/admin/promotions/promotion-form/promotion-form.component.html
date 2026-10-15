@@ -1,0 +1,14 @@
+<app-promotion-fields-form [draft]="draft" [submitted]="submitted()" />
+
+<div class="mt-6 flex justify-end gap-2">
+  <button type="button" class="rounded-md border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          [disabled]="saving()"
+          (click)="cancelled.emit()">
+    Cancel
+  </button>
+  <button type="button" class="rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="saving()"
+          (click)="save()">
+    {{ saving() ? 'Saving...' : 'Save Promotion' }}
+  </button>
+</div>

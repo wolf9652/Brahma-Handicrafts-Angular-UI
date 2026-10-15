@@ -4,6 +4,7 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
 import { CatalogProduct, Product, ProductDesign, ProductService } from '../../core/services/product.service';
 import { ApiUrlConstants } from '../../core/constants/apiUrl.constants';
 import { buildAssetUrl } from '../../core/utils/image-url.util';
+import { PromotionPricingService } from '../../core/services/promotion-pricing.service';
 
 interface ProductCardItem {
   product: Product;
@@ -58,9 +59,9 @@ export class ProductsComponent implements OnInit {
 
     switch (this.sortBy()) {
       case 'price-low':
-        return items.sort((a, b) => a.product.price - b.product.price);
+        return items.sort((a, b) => this.displayPrice(a.product) - this.displayPrice(b.product));
       case 'price-high':
-        return items.sort((a, b) => b.product.price - a.product.price);
+        return items.sort((a, b) => this.displayPrice(b.product) - this.displayPrice(a.product));
       case 'name':
         return items.sort((a, b) => a.product.name.localeCompare(b.product.name));
       case 'rating':
@@ -72,8 +73,14 @@ export class ProductsComponent implements OnInit {
 
   constructor(
     private readonly productService: ProductService,
-    private readonly urlConstants: ApiUrlConstants
+    private readonly urlConstants: ApiUrlConstants,
+    private readonly promotionPricingService: PromotionPricingService
   ) {}
+
+  // Sorting uses the price the customer actually sees (post-discount), not the raw base price.
+  private displayPrice(product: Product): number {
+    return this.promotionPricingService.applyDiscount(product.id, product.price);
+  }
 
   ngOnInit(): void {
     this.productService.getAllProducts().subscribe({

@@ -1,4 +1,4 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DialogModule } from 'primeng/dialog';
@@ -6,6 +6,7 @@ import { CartService } from '../../../core/services/cart.service';
 import { WishlistService } from '../../../core/services/wishlist.service';
 import { DesignDetail, DesignSize, Product, ProductService } from '../../../core/services/product.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { PromotionPricingService } from '../../../core/services/promotion-pricing.service';
 
 @Component({
   selector: 'app-product-card',
@@ -24,6 +25,16 @@ export class ProductCardComponent {
   protected readonly isWishlisted = computed(() =>
     this.wishlistService.isWishlisted(this.product().id, this.queryParams()?.['designId'])
   );
+
+  private readonly promotionPricingService = inject(PromotionPricingService);
+
+  protected readonly displayPrice = computed(() =>
+    this.promotionPricingService.applyDiscount(this.product().id, this.product().price)
+  );
+  protected readonly displayOriginalPrice = computed(() => {
+    const originalPrice = this.product().originalPrice;
+    return originalPrice === undefined ? undefined : this.promotionPricingService.applyDiscount(this.product().id, originalPrice);
+  });
 
   // Size-selection dialog state — used when the design has more than one size to choose from.
   protected readonly showSizeDialog = signal(false);
@@ -99,6 +110,11 @@ export class ProductCardComponent {
 
   protected selectDialogSize(size: DesignSize): void {
     this.selectedSize.set(size);
+  }
+
+  protected dialogDisplayPrice(design: DesignDetail): number {
+    const price = this.selectedSize() ? this.selectedSize()!.basePrice : design.estimatedPrice;
+    return this.promotionPricingService.applyDiscount(this.product().id, price);
   }
 
   protected closeSizeDialog(): void {
