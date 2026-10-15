@@ -28,9 +28,9 @@
                 <h3 class="font-playfair text-xl font-bold hover:text-[#caa062]">{{ entry.product.name }}</h3>
               </a>
               <div class="flex items-center justify-between">
-                <span class="text-2xl font-bold text-[#7fc77f]">₹{{ entry.product.price }}</span>
-                @if (entry.product.originalPrice) {
-                  <span class="text-sm text-gray-400 line-through">₹{{ entry.product.originalPrice }}</span>
+                <span class="text-2xl font-bold text-[#7fc77f]">₹{{ discountedPrice(entry) }}</span>
+                @if (discountedOriginalPrice(entry)) {
+                  <span class="text-sm text-gray-400 line-through">₹{{ discountedOriginalPrice(entry) }}</span>
                 }
               </div>
               <div class="flex gap-3">

@@ -12,6 +12,7 @@ export class ApiUrlConstants {
     public CATEGORIES = `${this.baseUrl}/Categories`;
     public ALL_PRODUCTS = `${this.baseUrl}/Products`;
     public NEWEST_PRODUCTS = `${this.baseUrl}/Products/newest`;
+    public ACTIVE_PROMOTIONS = `${this.baseUrl}/Promotions/active`;
     public WISHLIST_ADD = `${this.baseUrl}/Wishlist/add`;
     public CART_ADD = `${this.baseUrl}/Cart/add`;
     public CART_UPDATE = `${this.baseUrl}/Cart/update`;
@@ -40,6 +41,10 @@ export class ApiUrlConstants {
         return `${this.baseUrl}/Cart/${cartItemId}?userId=${userId}`;
     }
 
+    public cartClear(userId: string): string {
+        return `${this.baseUrl}/Cart/clear?userId=${userId}`;
+    }
+
     public updateUser(userId: string): string {
         return `${this.baseUrl}/Users/${userId}`;
     }
@@ -52,7 +57,32 @@ export class ApiUrlConstants {
         return `${this.baseUrl}/Addresses/user/${userId}`;
     }
 
+    public ORDERS = `${this.baseUrl}/Orders`;
+
+    public ordersByUser(userId: string): string {
+        return `${this.baseUrl}/Orders/user/${userId}`;
+    }
+
+    public orderStatus(orderId: string): string {
+        return `${this.baseUrl}/Orders/${orderId}/status`;
+    }
+
+    public adminOrderStatus(orderId: string): string {
+        return `${this.baseUrl}/admin/orders/${orderId}/status`;
+    }
+
     public ADMIN_PRODUCTS = `${this.baseUrl}/admin/products`;
+    public ADMIN_ORDERS = `${this.baseUrl}/admin/orders`;
+    public ADMIN_PROMOTIONS = `${this.baseUrl}/admin/promotions`;
+
+    public adminPromotionDetail(promotionId: string): string {
+        return `${this.baseUrl}/admin/promotions/${promotionId}`;
+    }
+
+    public adminPromotionStatus(promotionId: string): string {
+        return `${this.baseUrl}/admin/promotions/${promotionId}/status`;
+    }
+    public ADMIN_USERS = `${this.baseUrl}/admin/users`;
 
     public adminProductDetail(productId: string): string {
         return `${this.baseUrl}/admin/products/${productId}`;

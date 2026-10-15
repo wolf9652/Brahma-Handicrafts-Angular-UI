@@ -1,0 +1,100 @@
+<div class="rounded-lg border border-gray-200 bg-white shadow-sm transition">
+  <button type="button" class="flex w-full items-center gap-6 p-4 text-left" (click)="toggleExpand()">
+    <div class="grid flex-1 grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-x-4 text-sm text-gray-800">
+      <span class="truncate font-semibold text-gray-900">{{ current().name }}</span>
+      <span>{{ current().discountType }}</span>
+      <span>{{ formatValue() }}</span>
+      <span>{{ current().startDate | date: 'mediumDate' }}</span>
+      <span>{{ current().endDate | date: 'mediumDate' }}</span>
+      <span>{{ current().productCount }}</span>
+      <span class="w-fit rounded-full px-3 py-0.5 text-xs font-semibold"
+            [class.bg-green-100]="current().isActive"
+            [class.text-green-800]="current().isActive"
+            [class.bg-gray-100]="!current().isActive"
+            [class.text-gray-700]="!current().isActive">
+        {{ current().status }}
+      </span>
+    </div>
+
+    <svg class="h-5 w-5 shrink-0 text-gray-500 transition-transform"
+         [class.rotate-180]="expanded()"
+         viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+    </svg>
+  </button>
+
+  @if (expanded()) {
+    <div class="border-t border-gray-100 p-4">
+      @if (editing()) {
+        <app-promotion-fields-form [draft]="draft" [submitted]="submitted()" />
+        <div class="mt-4 flex justify-end gap-2">
+          <button type="button" class="rounded-md border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  [disabled]="saving()"
+                  (click)="cancelEdit()">
+            Cancel
+          </button>
+          <button type="button" class="rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  [disabled]="saving()"
+                  (click)="saveEdit()">
+            {{ saving() ? 'Saving...' : 'Save' }}
+          </button>
+        </div>
+      } @else {
+        <div class="relative mb-4 flex justify-end">
+          <button type="button" class="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700" title="More actions" (click)="toggleMenu()">
+            <i class="pi pi-ellipsis-v"></i>
+          </button>
+
+          @if (menuOpen()) {
+            <div class="absolute right-0 top-10 z-10 w-36 rounded-xl border border-gray-200 bg-white py-2 shadow-lg">
+              <button type="button" class="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50" (click)="startEdit()">Edit</button>
+              <button type="button" class="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      [disabled]="disabling()"
+                      (click)="toggleStatus()">
+                {{ disabling() ? toggleBusyLabel() : toggleLabel() }}
+              </button>
+              <button type="button" class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      [disabled]="deleting()"
+                      (click)="deletePromotion()">
+                {{ deleting() ? 'Deleting...' : 'Delete' }}
+              </button>
+            </div>
+          }
+        </div>
+
+        <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Discount</p>
+            <p class="text-sm text-gray-900">{{ current().discountType }} — {{ formatValue() }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Duration</p>
+            <p class="text-sm text-gray-900">{{ current().startDate | date: 'mediumDate' }} – {{ current().endDate | date: 'mediumDate' }}</p>
+          </div>
+        </div>
+
+        @if (displayBannerUrl()) {
+          <div class="mb-4">
+            <p class="mb-1 text-xs font-semibold uppercase tracking-wider text-gray-500">Banner Image</p>
+            <img [src]="displayBannerUrl()" [alt]="current().banners[0]?.altText || current().name"
+                 class="h-32 w-full max-w-md rounded-lg border border-gray-200 object-cover" />
+          </div>
+        }
+
+        <div>
+          <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">Products ({{ current().productCount }})</p>
+          <div class="flex flex-wrap gap-2">
+            @for (product of resolvedProducts(); track product.productId) {
+              <span class="flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 py-1 pl-1 pr-3 text-sm text-gray-800">
+                @if (product.image) {
+                  <img [src]="product.image" [alt]="product.productName" class="h-6 w-6 rounded-full object-cover" />
+                }
+                {{ product.productName }}
+              </span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

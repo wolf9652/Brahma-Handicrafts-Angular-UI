@@ -5,6 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { Product } from './product.service';
 import { ApiUrlConstants } from '../constants/apiUrl.constants';
 import { buildAssetUrl } from '../utils/image-url.util';
+import { PromotionPricingService } from './promotion-pricing.service';
 
 export interface CartItem {
   /** Unique per line: productId (+ designId, + sizeId when known) — so different designs/sizes of the
@@ -80,6 +81,7 @@ const CART_STORAGE_KEY = 'guest_cart';
 export class CartService {
   private readonly http = inject(HttpClient);
   private readonly urlConstants = inject(ApiUrlConstants);
+  private readonly promotionPricingService = inject(PromotionPricingService);
 
   readonly items = signal<CartItem[]>(this.readStoredItems());
   readonly isCartOpen = signal(false);
@@ -183,8 +185,13 @@ export class CartService {
     return this.items().reduce((sum, item) => sum + item.quantity, 0);
   }
 
+  /** A cart line's current price with its product's active promotion (if any) applied. */
+  effectivePrice(item: CartItem): number {
+    return this.promotionPricingService.applyDiscount(item.product.id, item.product.price);
+  }
+
   get totalPrice() {
-    return this.items().reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+    return this.items().reduce((sum, item) => sum + this.effectivePrice(item) * item.quantity, 0);
   }
 
   getTotal(): number {
@@ -206,6 +213,11 @@ export class CartService {
 
   getCartByUser(userId: string): Observable<CartUserItem[]> {
     return this.http.get<CartUserItem[]>(this.urlConstants.cartByUser(userId));
+  }
+
+  /** DELETE /api/Cart/clear?userId={userId} — clears every cart item for the user on the server. */
+  clearCartApi(userId: string): Observable<void> {
+    return this.http.delete<void>(this.urlConstants.cartClear(userId));
   }
 
   /** Fetches the user's cart from the server and replaces local state with it. Logged-in users only. */

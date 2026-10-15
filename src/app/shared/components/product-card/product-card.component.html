@@ -62,9 +62,9 @@
 
     <div class="mt-auto flex items-center justify-between px-4 gap-2 font-montserrat" [ngClass]="viewMode() === 'grid' ? 'justify-center' : 'justify-start'">
       <div class="flex items-center gap-2">
-        <span class="text-lg font-bold text-[#b08c57]">₹{{ product().price }}</span>
-        @if (product().originalPrice) {
-          <span class="text-sm text-red-500 line-through">₹{{ product().originalPrice }}</span>
+        <span class="text-lg font-bold text-[#b08c57]">₹{{ displayPrice() }}</span>
+        @if (displayOriginalPrice()) {
+          <span class="text-sm text-red-500 line-through">₹{{ displayOriginalPrice() }}</span>
         }
       </div>
       
@@ -94,7 +94,7 @@
       }
 
       <div class="text-xl font-bold text-[#b08c57]">
-        ₹{{ selectedSize() ? selectedSize()!.basePrice : design.estimatedPrice }}
+        ₹{{ dialogDisplayPrice(design) }}
       </div>
 
       <div class="flex flex-wrap justify-center gap-2">
